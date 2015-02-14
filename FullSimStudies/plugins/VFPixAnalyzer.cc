@@ -4,10 +4,13 @@
 #include <unordered_set>
 
 #include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "SimDataFormats/Track/interface/SimTrack.h"
 
 #include "VFPix/FullSimStudies/plugins/VFPixAnalyzer.h"
 
@@ -16,30 +19,32 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   pus_ (cfg.getParameter<edm::InputTag> ("pus")),
   vertices_ (cfg.getParameter<edm::InputTag> ("vertices")),
   tracks_ (cfg.getParameter<edm::InputTag> ("tracks")),
-  genParticles_ (cfg.getParameter<edm::InputTag> ("genParticles"))
+  genParticles_ (cfg.getParameter<edm::InputTag> ("genParticles")),
+  simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks"))
 {
-  vector<double> jetPtBins, trackPtBins, vertexPt2Bins, vertexTrackPtBins;
-  double a = 0.0,
-         b = 4.0,
-         n = 1000.0,
-         step = (b - a) / n;
-  for (double i = a; i < b + 0.5 * step; i += step)
-    jetPtBins.push_back (pow (10.0, i));
-  a = -1.0, b = 1.0, n = 100.0, step = (b - a) / n;
-  for (double i = a; i < b + 0.5 * step; i += step)
-    trackPtBins.push_back (pow (10.0, i));
-  a = -1.0, b = 8.0, n = 1000.0, step = (b - a) / n;
-  for (double i = a; i < b + 0.5 * step; i += step)
-    vertexPt2Bins.push_back (pow (10.0, i));
-  a = -2.0, b = 2.0, n = 1000.0, step = (b - a) / n;
-  for (double i = a; i < b + 0.5 * step; i += step)
-    vertexTrackPtBins.push_back (pow (10.0, i));
+  vector<double> jetPtBins, trackPtBins, vertexPt2Bins, vertexTrackPtBins, ptErrorBins, d0ErrorBins, dzErrorBins, xErrorBins, yErrorBins, trackErrorPtBins, trackErrorBins, trackEtaBins;
+  logSpace  (1000,  0.0,   4.0,  jetPtBins);
+  logSpace  (100,   -1.0,  1.0,  trackPtBins);
+  logSpace  (1000,  -1.0,  8.0,  vertexPt2Bins);
+  logSpace  (1000,  -2.0,  2.0,  vertexTrackPtBins);
+  logSpace  (1000,  -2.0,  5.0,  ptErrorBins);
+  logSpace  (1000,  -5.0,  0.0,  d0ErrorBins);
+  logSpace  (1000,  -5.0,  1.0,  dzErrorBins);
+  logSpace  (1000,  -5.0,  1.0,  xErrorBins);
+  logSpace  (1000,  -5.0,  1.0,  yErrorBins);
+  logSpace  (100,   -1.0,  3.0,  trackErrorPtBins);
+  logSpace  (1000,  -6.0,  6.0,  trackErrorBins);
+
+  linSpace  (50,    0.0,   5.0,  trackEtaBins);
 
   TH1::SetDefaultSumw2 ();
   TFileDirectory jetDir = fs_->mkdir ("jets"),
                  puDir = fs_->mkdir ("pu"),
                  vertexDir = fs_->mkdir ("vertices"),
-                 trackDir = fs_->mkdir ("tracks");
+                 trackDir = fs_->mkdir ("tracks"),
+                 electronDir = fs_->mkdir ("electrons"),
+                 muonDir = fs_->mkdir ("muons"),
+                 fakeTrackDir = fs_->mkdir ("fakeTrack");
 
   oneDHists_["jetEta"]   = jetDir.make<TH1D> ("jetEta", ";jet #eta", 1000, -5.0, 5.0);
   oneDHists_["jetPt"]    = jetDir.make<TH1D> ("jetPt", ";jet p_{T} [GeV]", jetPtBins.size () - 1, jetPtBins.data ());
@@ -81,7 +86,117 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   twoDHists_["nVerticesVsNPU"] = vertexDir.make<TH2D> ("nVerticesVsNPU", ";number of interactions;number of primary vertices", 280, 0.0, 280.0, 280, 0.0, 280.0);
 
+  oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
+  twoDHists_["ptErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["d0ErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["dzErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("dzErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["ptErrorVsTrackEta_1p0"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["d0ErrorVsTrackEta_1p0"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["dzErrorVsTrackEta_1p0"] = trackDir.make<TH2D> ("dzErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["ptErrorVsTrackEta_10p0"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["d0ErrorVsTrackEta_10p0"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["dzErrorVsTrackEta_10p0"] = trackDir.make<TH2D> ("dzErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["ptErrorVsTrackEta_50p0"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["d0ErrorVsTrackEta_50p0"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["dzErrorVsTrackEta_50p0"] = trackDir.make<TH2D> ("dzErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["ptErrorVsTrackEta_100p0"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["d0ErrorVsTrackEta_100p0"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["dzErrorVsTrackEta_100p0"] = trackDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["bpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["bpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+  twoDHists_["fpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["fpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+
+  threeDHists_["trackPtError"] = trackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["trackD0Error"] = trackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["trackDzError"] = trackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+
+  oneDHists_["electrons/bpixHitsVsTrackEta"] = electronDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["electrons/fpixHitsVsTrackEta"] = electronDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+
+  twoDHists_["electrons/trackPtVsTrackZ"] = electronDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
+  twoDHists_["electrons/ptErrorVsTrackEta_0p7"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["electrons/d0ErrorVsTrackEta_0p7"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["electrons/dzErrorVsTrackEta_0p7"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/ptErrorVsTrackEta_1p0"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["electrons/d0ErrorVsTrackEta_1p0"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["electrons/dzErrorVsTrackEta_1p0"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/ptErrorVsTrackEta_10p0"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["electrons/d0ErrorVsTrackEta_10p0"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["electrons/dzErrorVsTrackEta_10p0"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/ptErrorVsTrackEta_50p0"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["electrons/d0ErrorVsTrackEta_50p0"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["electrons/dzErrorVsTrackEta_50p0"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/ptErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["electrons/d0ErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["electrons/dzErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/bpixXErrorVsTrackEta"] = electronDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["electrons/bpixYErrorVsTrackEta"] = electronDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+  twoDHists_["electrons/fpixXErrorVsTrackEta"] = electronDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["electrons/fpixYErrorVsTrackEta"] = electronDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+
+  threeDHists_["electrons/trackPtError"] = electronDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["electrons/trackD0Error"] = electronDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["electrons/trackDzError"] = electronDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+
+  oneDHists_["muons/bpixHitsVsTrackEta"] = muonDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["muons/fpixHitsVsTrackEta"] = muonDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+
+  twoDHists_["muons/trackPtVsTrackZ"] = muonDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
+  twoDHists_["muons/ptErrorVsTrackEta_0p7"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["muons/d0ErrorVsTrackEta_0p7"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["muons/dzErrorVsTrackEta_0p7"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/ptErrorVsTrackEta_1p0"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["muons/d0ErrorVsTrackEta_1p0"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["muons/dzErrorVsTrackEta_1p0"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/ptErrorVsTrackEta_10p0"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["muons/d0ErrorVsTrackEta_10p0"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["muons/dzErrorVsTrackEta_10p0"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/ptErrorVsTrackEta_50p0"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["muons/d0ErrorVsTrackEta_50p0"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["muons/dzErrorVsTrackEta_50p0"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/ptErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["muons/d0ErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["muons/dzErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/bpixXErrorVsTrackEta"] = muonDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["muons/bpixYErrorVsTrackEta"] = muonDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+  twoDHists_["muons/fpixXErrorVsTrackEta"] = muonDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["muons/fpixYErrorVsTrackEta"] = muonDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+
+  threeDHists_["muons/trackPtError"] = muonDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["muons/trackD0Error"] = muonDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["muons/trackDzError"] = muonDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+
+  oneDHists_["fakeTracks/bpixHitsVsTrackEta"] = fakeTrackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["fakeTracks/fpixHitsVsTrackEta"] = fakeTrackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+
+  twoDHists_["fakeTracks/trackPtVsTrackZ"] = fakeTrackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
+  twoDHists_["fakeTracks/ptErrorVsTrackEta_0p7"] = fakeTrackDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["fakeTracks/d0ErrorVsTrackEta_0p7"] = fakeTrackDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["fakeTracks/dzErrorVsTrackEta_0p7"] = fakeTrackDir.make<TH2D> ("dzErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["fakeTracks/ptErrorVsTrackEta_1p0"] = fakeTrackDir.make<TH2D> ("ptErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["fakeTracks/d0ErrorVsTrackEta_1p0"] = fakeTrackDir.make<TH2D> ("d0ErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["fakeTracks/dzErrorVsTrackEta_1p0"] = fakeTrackDir.make<TH2D> ("dzErrorVsTrackEta_1p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["fakeTracks/ptErrorVsTrackEta_10p0"] = fakeTrackDir.make<TH2D> ("ptErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["fakeTracks/d0ErrorVsTrackEta_10p0"] = fakeTrackDir.make<TH2D> ("d0ErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["fakeTracks/dzErrorVsTrackEta_10p0"] = fakeTrackDir.make<TH2D> ("dzErrorVsTrackEta_10p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["fakeTracks/ptErrorVsTrackEta_50p0"] = fakeTrackDir.make<TH2D> ("ptErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["fakeTracks/d0ErrorVsTrackEta_50p0"] = fakeTrackDir.make<TH2D> ("d0ErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["fakeTracks/dzErrorVsTrackEta_50p0"] = fakeTrackDir.make<TH2D> ("dzErrorVsTrackEta_50p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["fakeTracks/ptErrorVsTrackEta_100p0"] = fakeTrackDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
+  twoDHists_["fakeTracks/d0ErrorVsTrackEta_100p0"] = fakeTrackDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
+  twoDHists_["fakeTracks/dzErrorVsTrackEta_100p0"] = fakeTrackDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["fakeTracks/bpixXErrorVsTrackEta"] = fakeTrackDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["fakeTracks/bpixYErrorVsTrackEta"] = fakeTrackDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+  twoDHists_["fakeTracks/fpixXErrorVsTrackEta"] = fakeTrackDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
+  twoDHists_["fakeTracks/fpixYErrorVsTrackEta"] = fakeTrackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+
+  threeDHists_["fakeTracks/trackPtError"] = fakeTrackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["fakeTracks/trackD0Error"] = fakeTrackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["fakeTracks/trackDzError"] = fakeTrackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
 }
 
 VFPixAnalyzer::~VFPixAnalyzer ()
@@ -101,6 +216,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   event.getByLabel (tracks_, tracks);
   edm::Handle<vector<reco::GenParticle> > genParticles;
   event.getByLabel (genParticles_, genParticles);
+  edm::Handle<vector<SimTrack> > simTracks;
+  event.getByLabel (simTracks_, simTracks);
 
   double nPU_bx0 = 0.0;
   for (const auto &pu : *pus)
@@ -208,9 +325,183 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   for (const auto &track : *tracks)
     {
       double vz = track.vz (),
-             pt = track.pt ();
+             pt = track.pt (),
+             eta = track.eta (),
+             ptError = track.ptError (),
+             d0Error = track.d0Error (),
+             dzError = track.dzError ();
 
       twoDHists_.at ("trackPtVsTrackZ")->Fill (vz, pt);
+      if (fabs (pt - 0.7) / 0.7 < 0.1)
+        {
+          twoDHists_.at ("ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
+          twoDHists_.at ("d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
+          twoDHists_.at ("dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+        }
+      if (fabs (pt - 1.0) / 1.0 < 0.1)
+        {
+          twoDHists_.at ("ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+          twoDHists_.at ("d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
+          twoDHists_.at ("dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+        }
+      if (fabs (pt - 10.0) / 10.0 < 0.1)
+        {
+          twoDHists_.at ("ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+          twoDHists_.at ("d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
+          twoDHists_.at ("dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+        }
+      if (fabs (pt - 50.0) / 50.0 < 0.1)
+        {
+          twoDHists_.at ("ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+          twoDHists_.at ("d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
+          twoDHists_.at ("dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+        }
+      if (fabs (pt - 100.0) / 100.0 < 0.1)
+        {
+          twoDHists_.at ("ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+          twoDHists_.at ("d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
+          twoDHists_.at ("dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+        }
+
+      threeDHists_.at ("trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
+      threeDHists_.at ("trackD0Error")->Fill (eta, pt, d0Error);
+      threeDHists_.at ("trackDzError")->Fill (eta, pt, dzError);
+
+      if (isMatched (track, genParticles, 11))
+        {
+          twoDHists_.at ("electrons/trackPtVsTrackZ")->Fill (vz, pt);
+          if (fabs (pt - 0.7) / 0.7 < 0.1)
+            {
+              twoDHists_.at ("electrons/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("electrons/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("electrons/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 1.0) / 1.0 < 0.1)
+            {
+              twoDHists_.at ("electrons/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("electrons/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("electrons/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 10.0) / 10.0 < 0.1)
+            {
+              twoDHists_.at ("electrons/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("electrons/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("electrons/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 50.0) / 50.0 < 0.1)
+            {
+              twoDHists_.at ("electrons/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("electrons/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("electrons/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 100.0) / 100.0 < 0.1)
+            {
+              twoDHists_.at ("electrons/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("electrons/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("electrons/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+            }
+
+          threeDHists_.at ("electrons/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
+          threeDHists_.at ("electrons/trackD0Error")->Fill (eta, pt, d0Error);
+          threeDHists_.at ("electrons/trackDzError")->Fill (eta, pt, dzError);
+        }
+      else if (isMatched (track, genParticles, 13))
+        {
+          twoDHists_.at ("muons/trackPtVsTrackZ")->Fill (vz, pt);
+          if (fabs (pt - 0.7) / 0.7 < 0.1)
+            {
+              twoDHists_.at ("muons/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("muons/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("muons/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 1.0) / 1.0 < 0.1)
+            {
+              twoDHists_.at ("muons/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("muons/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("muons/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 10.0) / 10.0 < 0.1)
+            {
+              twoDHists_.at ("muons/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("muons/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("muons/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 50.0) / 50.0 < 0.1)
+            {
+              twoDHists_.at ("muons/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("muons/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("muons/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 100.0) / 100.0 < 0.1)
+            {
+              twoDHists_.at ("muons/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("muons/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("muons/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+            }
+
+          threeDHists_.at ("muons/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
+          threeDHists_.at ("muons/trackD0Error")->Fill (eta, pt, d0Error);
+          threeDHists_.at ("muons/trackDzError")->Fill (eta, pt, dzError);
+        }
+      else if (!isMatched (track, simTracks))
+        {
+          twoDHists_.at ("fakeTracks/trackPtVsTrackZ")->Fill (vz, pt);
+          if (fabs (pt - 0.7) / 0.7 < 0.1)
+            {
+              twoDHists_.at ("fakeTracks/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("fakeTracks/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("fakeTracks/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 1.0) / 1.0 < 0.1)
+            {
+              twoDHists_.at ("fakeTracks/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("fakeTracks/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("fakeTracks/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 10.0) / 10.0 < 0.1)
+            {
+              twoDHists_.at ("fakeTracks/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("fakeTracks/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("fakeTracks/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 50.0) / 50.0 < 0.1)
+            {
+              twoDHists_.at ("fakeTracks/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("fakeTracks/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("fakeTracks/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+            }
+          if (fabs (pt - 100.0) / 100.0 < 0.1)
+            {
+              twoDHists_.at ("fakeTracks/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
+              twoDHists_.at ("fakeTracks/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
+              twoDHists_.at ("fakeTracks/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+            }
+
+          threeDHists_.at ("fakeTracks/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
+          threeDHists_.at ("fakeTracks/trackD0Error")->Fill (eta, pt, d0Error);
+          threeDHists_.at ("fakeTracks/trackDzError")->Fill (eta, pt, dzError);
+        }
+
+/*      for (const auto &hit : track.extra ()->recHits ())
+        {
+          int det = hit->geographicalId ().det (),
+              subdetId = hit->geographicalId ().subdetId ();
+          double xError = sqrt (hit->localPositionError ().xx ()),
+                 yError = sqrt (hit->localPositionError ().yy ());
+
+          if (det == DetId::Tracker && subdetId == PixelSubdetector::PixelBarrel)
+            {
+              oneDHists_.at ("bpixHitsVsTrackEta")->Fill (eta);
+              twoDHists_.at ("bpixXErrorVsTrackEta")->Fill (fabs (eta), xError);
+              twoDHists_.at ("bpixYErrorVsTrackEta")->Fill (fabs (eta), yError);
+            }
+          if (det == DetId::Tracker && subdetId == PixelSubdetector::PixelEndcap)
+            {
+              oneDHists_.at ("fpixHitsVsTrackEta")->Fill (eta);
+              twoDHists_.at ("fpixXErrorVsTrackEta")->Fill (fabs (eta), xError);
+              twoDHists_.at ("fpixYErrorVsTrackEta")->Fill (fabs (eta), yError);
+            }
+        }*/
     }
 
   for (const auto &jet : *jets)
@@ -254,6 +545,59 @@ VFPixAnalyzer::trackHash (const reco::Track &track) const
   ss2 << abs ((track.phi () + 4.0) * 1.0e3);
 
   return atoll ((ss0.str () + ss1.str () + ss2.str ()).c_str ());
+}
+
+void
+VFPixAnalyzer::logSpace (const unsigned n, const double a, const double b, vector<double> &bins) const
+{
+  double step = (b - a) / ((double) n);
+
+  bins.clear ();
+  for (double i = a; i < b + 0.5 * step; i += step)
+    bins.push_back (pow (10.0, i));
+}
+
+void
+VFPixAnalyzer::linSpace (const unsigned n, const double a, const double b, vector<double> &bins) const
+{
+  double step = (b - a) / ((double) n);
+
+  bins.clear ();
+  for (double i = a; i < b + 0.5 * step; i += step)
+    bins.push_back (i);
+}
+
+bool
+VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<reco::GenParticle> > &genParticles, const unsigned id) const
+{
+  for (const auto &genParticle : *genParticles)
+    {
+      if (abs (genParticle.pdgId ()) != id
+       || genParticle.status () != 1
+       || genParticle.numberOfDaughters () != 0)
+        continue;
+
+      double dR = deltaR (track, genParticle);
+      if (dR > 0.1)
+        continue;
+
+      return true;
+    }
+  return false;
+}
+
+bool
+VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<SimTrack> > &simTracks) const
+{
+  for (const auto &simTrack : *simTracks)
+    {
+      double dR = deltaR (track.eta (), track.phi (), simTrack.momentum ().Eta (), simTrack.momentum ().Phi ());
+      if (dR > 0.1)
+        continue;
+
+      return true;
+    }
+  return false;
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
