@@ -5,12 +5,10 @@
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/DetId/interface/DetId.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-#include "SimDataFormats/Track/interface/SimTrack.h"
 
 #include "VFPix/FullSimStudies/plugins/VFPixAnalyzer.h"
 
@@ -90,6 +88,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -119,6 +118,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["electrons/bpixHitsVsTrackEta"] = electronDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["electrons/fpixHitsVsTrackEta"] = electronDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["electrons/nTracks"] = electronDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   twoDHists_["electrons/trackEtaVsTrackPt"] = electronDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["electrons/trackPtVsTrackZ"] = electronDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -148,6 +148,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["muons/bpixHitsVsTrackEta"] = muonDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["muons/fpixHitsVsTrackEta"] = muonDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["muons/nTracks"] = muonDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   twoDHists_["muons/trackEtaVsTrackPt"] = muonDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["muons/trackPtVsTrackZ"] = muonDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -177,6 +178,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["chargedHadrons/bpixHitsVsTrackEta"] = chargedHadronDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["chargedHadrons/fpixHitsVsTrackEta"] = chargedHadronDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["chargedHadrons/nTracks"] = chargedHadronDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   twoDHists_["chargedHadrons/trackEtaVsTrackPt"] = chargedHadronDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["chargedHadrons/trackPtVsTrackZ"] = chargedHadronDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -206,6 +208,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["fakeTracks/bpixHitsVsTrackEta"] = fakeTrackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["fakeTracks/fpixHitsVsTrackEta"] = fakeTrackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  oneDHists_["fakeTracks/nTracks"] = fakeTrackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   twoDHists_["fakeTracks/trackEtaVsTrackPt"] = fakeTrackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["fakeTracks/trackPtVsTrackZ"] = fakeTrackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -297,7 +300,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
              ez = vertices->at (0).zError (),
              sumPt2 = 0.0;
       int ndf = vertices->at (0).ndof (),
-          nTracks = 0.0;
+          nTracks = 0;
 
       oneDHists_.at ("pvX")->Fill (x);
       oneDHists_.at ("pvY")->Fill (y);
@@ -334,7 +337,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
              ez = vertex.zError (),
              sumPt2 = 0.0;
       int ndf = vertex.ndof (),
-          nTracks = 0.0;
+          nTracks = 0;
 
       oneDHists_.at ("vertexX")->Fill (x);
       oneDHists_.at ("vertexY")->Fill (y);
@@ -357,6 +360,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       oneDHists_.at ("vertexSumPt2")->Fill (sumPt2);
     }
 
+  unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
   for (const auto &track : *tracks)
     {
       double vz = track.vz (),
@@ -366,6 +370,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
              d0Error = track.d0Error (),
              dzError = track.dzError ();
 
+      if (pt > 0.7)
+        nTracks++;
       twoDHists_.at ("trackEtaVsTrackPt")->Fill (pt, eta);
       twoDHists_.at ("trackPtVsTrackZ")->Fill (vz, pt);
       if (fabs (pt - 0.7) / 0.7 < 0.1)
@@ -405,6 +411,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
       if (isMatched (track, genParticles, 11, 0.1))
         {
+          if (pt > 0.7)
+            nElectrons++;
           twoDHists_.at ("electrons/trackEtaVsTrackPt")->Fill (pt, eta);
           twoDHists_.at ("electrons/trackPtVsTrackZ")->Fill (vz, pt);
           if (fabs (pt - 0.7) / 0.7 < 0.1)
@@ -444,6 +452,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       else if (isMatched (track, genParticles, 13, 0.1))
         {
+          if (pt > 0.7)
+            nMuons++;
           twoDHists_.at ("muons/trackEtaVsTrackPt")->Fill (pt, eta);
           twoDHists_.at ("muons/trackPtVsTrackZ")->Fill (vz, pt);
           if (fabs (pt - 0.7) / 0.7 < 0.1)
@@ -483,6 +493,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       else if (isMatched (track, simTracks, 0.001))
         {
+          if (pt > 0.7)
+            nChargedHadrons++;
           twoDHists_.at ("chargedHadrons/trackEtaVsTrackPt")->Fill (pt, eta);
           twoDHists_.at ("chargedHadrons/trackPtVsTrackZ")->Fill (vz, pt);
           if (fabs (pt - 0.7) / 0.7 < 0.1)
@@ -522,6 +534,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       else
         {
+          if (pt > 0.7)
+            nFakeTracks++;
           twoDHists_.at ("fakeTracks/trackEtaVsTrackPt")->Fill (pt, eta);
           twoDHists_.at ("fakeTracks/trackPtVsTrackZ")->Fill (vz, pt);
           if (fabs (pt - 0.7) / 0.7 < 0.1)
@@ -582,6 +596,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             }
         }*/
     }
+  oneDHists_.at ("nTracks")->Fill (nTracks);
+  oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
+  oneDHists_.at ("muons/nTracks")->Fill (nMuons);
+  oneDHists_.at ("chargedHadrons/nTracks")->Fill (nChargedHadrons);
+  oneDHists_.at ("fakeTracks/nTracks")->Fill (nFakeTracks);
 
   for (const auto &jet : *jets)
     {

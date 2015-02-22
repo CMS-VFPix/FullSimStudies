@@ -6,14 +6,18 @@
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+
+#include "SimDataFormats/Track/interface/SimTrack.h"
 
 #include "TH1D.h"
 #include "TH2D.h"

@@ -6,6 +6,7 @@
 <use  name="DataFormats/HepMCCandidate"/>
 <use  name="DataFormats/JetReco"/>
 <use  name="DataFormats/Math"/>
+<use  name="DataFormats/ParticleFlowCandidate"/>
 <use  name="DataFormats/SiPixelDetId"/>
 <use  name="DataFormats/TrackReco"/>
 <use  name="DataFormats/VertexReco"/>
