@@ -272,8 +272,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             oneDHists_.at ("nOOPU")->Fill (currentNPU);
             break;
           case 0:
-            oneDHists_.at ("nPU_bx0")->Fill (currentNPU);
-            nPU_bx0 = currentNPU;
+            oneDHists_.at ("nPU_bx0")->Fill (nPU_bx0 = currentNPU);
             break;
           case 1:
             oneDHists_.at ("nPU_bxP1")->Fill (currentNPU);
@@ -284,13 +283,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
     }
 
-  double nVertices = vertices->size (),
-         pvTrueX = genParticles->at (2).vx (),
+  double pvTrueX = genParticles->at (2).vx (),
          pvTrueY = genParticles->at (2).vy (),
          pvTrueZ = genParticles->at (2).vz ();
   unordered_set<long long> pvTrackID;
-  twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
-  if (nVertices > 0)
+  if (vertices->size () > 0)
     {
       double x = vertices->at (0).x (),
              y = vertices->at (0).y (),
@@ -302,31 +299,35 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       int ndf = vertices->at (0).ndof (),
           nTracks = 0;
 
-      oneDHists_.at ("pvX")->Fill (x);
-      oneDHists_.at ("pvY")->Fill (y);
-      oneDHists_.at ("pvZ")->Fill (z);
-      oneDHists_.at ("pvXError")->Fill (ex);
-      oneDHists_.at ("pvYError")->Fill (ey);
-      oneDHists_.at ("pvZError")->Fill (ez);
-      oneDHists_.at ("pvDeltaX")->Fill (pvTrueX - x);
-      oneDHists_.at ("pvDeltaY")->Fill (pvTrueY - y);
-      oneDHists_.at ("pvDeltaZ")->Fill (pvTrueZ - z);
-      oneDHists_.at ("pvNDF")->Fill (ndf);
-
-      for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
+      if (ndf >= 4)
         {
-          double pt = (*track)->pt ();
-          long long id = trackHash (**track);
+          oneDHists_.at ("pvX")->Fill (x);
+          oneDHists_.at ("pvY")->Fill (y);
+          oneDHists_.at ("pvZ")->Fill (z);
+          oneDHists_.at ("pvXError")->Fill (ex);
+          oneDHists_.at ("pvYError")->Fill (ey);
+          oneDHists_.at ("pvZError")->Fill (ez);
+          oneDHists_.at ("pvDeltaX")->Fill (pvTrueX - x);
+          oneDHists_.at ("pvDeltaY")->Fill (pvTrueY - y);
+          oneDHists_.at ("pvDeltaZ")->Fill (pvTrueZ - z);
+          oneDHists_.at ("pvNDF")->Fill (ndf);
 
-          if (pt < 0.7)
-            continue;
-          nTracks++;
-          sumPt2 += pt * pt;
-          pvTrackID.insert (id);
+          for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
+            {
+              double pt = (*track)->pt ();
+              long long id = trackHash (**track);
+
+              if (pt < 0.7)
+                continue;
+              nTracks++;
+              sumPt2 += pt * pt;
+              pvTrackID.insert (id);
+            }
+          oneDHists_.at ("pvNTracks")->Fill (nTracks);
+          oneDHists_.at ("pvSumPt2")->Fill (sumPt2);
         }
-      oneDHists_.at ("pvNTracks")->Fill (nTracks);
-      oneDHists_.at ("pvSumPt2")->Fill (sumPt2);
     }
+  unsigned nVertices = 0;
   for (const auto &vertex : *vertices)
     {
       double x = vertex.x (),
@@ -339,6 +340,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       int ndf = vertex.ndof (),
           nTracks = 0;
 
+      if (ndf < 4)
+        continue;
       oneDHists_.at ("vertexX")->Fill (x);
       oneDHists_.at ("vertexY")->Fill (y);
       oneDHists_.at ("vertexZ")->Fill (z);
@@ -358,7 +361,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       oneDHists_.at ("vertexNTracks")->Fill (nTracks);
       oneDHists_.at ("vertexSumPt2")->Fill (sumPt2);
+      nVertices++;
     }
+  twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
   unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
   for (const auto &track : *tracks)
