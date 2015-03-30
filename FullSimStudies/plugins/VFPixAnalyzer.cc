@@ -370,11 +370,20 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
     {
       double vz = track.vz (),
              pt = track.pt (),
+             d0 = track.d0 (),
              eta = track.eta (),
+             normalizedChi2 = track.normalizedChi2 (),
              ptError = track.ptError (),
              d0Error = track.d0Error (),
              dzError = track.dzError ();
+      unsigned pixelLayersWithMeasurement = track.hitPattern ().pixelLayersWithMeasurement (),
+               trackerLayersWithMeasurement = track.hitPattern ().trackerLayersWithMeasurement ();
 
+      if (normalizedChi2 > 20.0
+       || pixelLayersWithMeasurement < 2
+       || trackerLayersWithMeasurement < 5
+       || (d0 / d0Error) > 5.0)
+        continue;
       if (pt > 0.7)
         nTracks++;
       twoDHists_.at ("trackEtaVsTrackPt")->Fill (pt, eta);
