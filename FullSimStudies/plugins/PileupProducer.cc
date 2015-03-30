@@ -13,7 +13,9 @@ PileupProducer::PileupProducer (const edm::ParameterSet &cfg) :
   simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks"))
 {
   produces<vector<reco::Track> > ("pileupTracks");
+  produces<vector<reco::Track> > ("primaryTracks");
   produces<vector<reco::PFCandidate> > ("pileupNeutrals");
+  produces<vector<reco::PFCandidate> > ("primaryNeutrals");
   produces<vector<reco::GenParticle> > ("status3");
 }
 
@@ -34,13 +36,17 @@ PileupProducer::produce (edm::Event &event, const edm::EventSetup &setup)
   event.getByLabel (simTracks_, simTracks);
 
   auto_ptr<vector<reco::Track> > pileupTracks (new vector<reco::Track> ());
+  auto_ptr<vector<reco::Track> > primaryTracks (new vector<reco::Track> ());
   auto_ptr<vector<reco::PFCandidate> > pileupNeutrals (new vector<reco::PFCandidate> ());
+  auto_ptr<vector<reco::PFCandidate> > primaryNeutrals (new vector<reco::PFCandidate> ());
   auto_ptr<vector<reco::GenParticle> > status3 (new vector<reco::GenParticle> ());
 
   for (const auto &track : *tracks)
     {
       if (!isMatched (track, simTracks, 0.01))
         pileupTracks->push_back (track);
+      else
+        primaryTracks->push_back (track);
     }
   for (const auto &pfCandidate : *pfCandidates)
     {
@@ -48,6 +54,8 @@ PileupProducer::produce (edm::Event &event, const edm::EventSetup &setup)
         continue;
       if (!isMatched (pfCandidate, genParticles, 0.01))
         pileupNeutrals->push_back (pfCandidate);
+      else
+        primaryNeutrals->push_back (pfCandidate);
     }
   for (const auto &genParticle : *genParticles)
     {
@@ -56,7 +64,9 @@ PileupProducer::produce (edm::Event &event, const edm::EventSetup &setup)
       status3->push_back (genParticle);
     }
   event.put (pileupTracks, "pileupTracks");
+  event.put (primaryTracks, "primaryTracks");
   event.put (pileupNeutrals, "pileupNeutrals");
+  event.put (primaryNeutrals, "primaryNeutrals");
   event.put (status3, "status3");
 }
 
