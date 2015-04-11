@@ -49,8 +49,8 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     long long trackHash (const reco::Track &) const;
     void logSpace (const unsigned, const double, const double, vector<double> &) const;
     void linSpace (const unsigned, const double, const double, vector<double> &) const;
-    bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double) const;
-    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
 };
 
 #endif

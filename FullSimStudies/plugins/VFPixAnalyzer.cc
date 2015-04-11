@@ -20,7 +20,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   genParticles_ (cfg.getParameter<edm::InputTag> ("genParticles")),
   simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks"))
 {
-  vector<double> jetPtBins, trackPtBins, fineTrackPtBins, vertexPt2Bins, vertexTrackPtBins, ptErrorBins, d0ErrorBins, dzErrorBins, xErrorBins, yErrorBins, trackErrorPtBins, trackErrorBins, trackEtaBins;
+  vector<double> jetPtBins, trackPtBins, fineTrackPtBins, vertexPt2Bins, vertexTrackPtBins, ptErrorBins, d0ErrorBins, dzErrorBins, xErrorBins, yErrorBins, trackErrorPtBins, trackErrorBins, trackEtaBins,
+                 ptDeltaBins, d0DeltaBins, dzDeltaBins, trackDeltaPtBins, trackDeltaBins;
   logSpace  (1000,  0.0,   4.0,  jetPtBins);
   logSpace  (100,   -1.0,  1.0,  trackPtBins);
   logSpace  (1000,  -1.0,  3.0,  fineTrackPtBins);
@@ -29,6 +30,9 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   logSpace  (1000,  -2.0,  5.0,  ptErrorBins);
   logSpace  (1000,  -5.0,  0.0,  d0ErrorBins);
   logSpace  (1000,  -5.0,  1.0,  dzErrorBins);
+  linSpace  (1000,  -10.0, 10.0,  ptDeltaBins);
+  linSpace  (1000,  -0.1,  0.1,  d0DeltaBins);
+  linSpace  (1000,  -0.05,  0.05,  dzDeltaBins);
   logSpace  (1000,  -5.0,  1.0,  xErrorBins);
   logSpace  (1000,  -5.0,  1.0,  yErrorBins);
   logSpace  (100,   -1.0,  3.0,  trackErrorPtBins);
@@ -137,6 +141,21 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   twoDHists_["electrons/ptErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
   twoDHists_["electrons/d0ErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
   twoDHists_["electrons/dzErrorVsTrackEta_100p0"] = electronDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["electrons/ptDeltaVsTrackEta_0p7"] = electronDir.make<TH2D> ("ptDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["electrons/d0DeltaVsTrackEta_0p7"] = electronDir.make<TH2D> ("d0DeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["electrons/dzDeltaVsTrackEta_0p7"] = electronDir.make<TH2D> ("dzDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["electrons/ptDeltaVsTrackEta_1p0"] = electronDir.make<TH2D> ("ptDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["electrons/d0DeltaVsTrackEta_1p0"] = electronDir.make<TH2D> ("d0DeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["electrons/dzDeltaVsTrackEta_1p0"] = electronDir.make<TH2D> ("dzDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["electrons/ptDeltaVsTrackEta_10p0"] = electronDir.make<TH2D> ("ptDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["electrons/d0DeltaVsTrackEta_10p0"] = electronDir.make<TH2D> ("d0DeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["electrons/dzDeltaVsTrackEta_10p0"] = electronDir.make<TH2D> ("dzDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["electrons/ptDeltaVsTrackEta_50p0"] = electronDir.make<TH2D> ("ptDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["electrons/d0DeltaVsTrackEta_50p0"] = electronDir.make<TH2D> ("d0DeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["electrons/dzDeltaVsTrackEta_50p0"] = electronDir.make<TH2D> ("dzDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["electrons/ptDeltaVsTrackEta_100p0"] = electronDir.make<TH2D> ("ptDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["electrons/d0DeltaVsTrackEta_100p0"] = electronDir.make<TH2D> ("d0DeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["electrons/dzDeltaVsTrackEta_100p0"] = electronDir.make<TH2D> ("dzDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
   twoDHists_["electrons/bpixXErrorVsTrackEta"] = electronDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
   twoDHists_["electrons/bpixYErrorVsTrackEta"] = electronDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
   twoDHists_["electrons/fpixXErrorVsTrackEta"] = electronDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
@@ -167,6 +186,21 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   twoDHists_["muons/ptErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
   twoDHists_["muons/d0ErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
   twoDHists_["muons/dzErrorVsTrackEta_100p0"] = muonDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["muons/ptDeltaVsTrackEta_0p7"] = muonDir.make<TH2D> ("ptDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["muons/d0DeltaVsTrackEta_0p7"] = muonDir.make<TH2D> ("d0DeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["muons/dzDeltaVsTrackEta_0p7"] = muonDir.make<TH2D> ("dzDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["muons/ptDeltaVsTrackEta_1p0"] = muonDir.make<TH2D> ("ptDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["muons/d0DeltaVsTrackEta_1p0"] = muonDir.make<TH2D> ("d0DeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["muons/dzDeltaVsTrackEta_1p0"] = muonDir.make<TH2D> ("dzDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["muons/ptDeltaVsTrackEta_10p0"] = muonDir.make<TH2D> ("ptDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["muons/d0DeltaVsTrackEta_10p0"] = muonDir.make<TH2D> ("d0DeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["muons/dzDeltaVsTrackEta_10p0"] = muonDir.make<TH2D> ("dzDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["muons/ptDeltaVsTrackEta_50p0"] = muonDir.make<TH2D> ("ptDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["muons/d0DeltaVsTrackEta_50p0"] = muonDir.make<TH2D> ("d0DeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["muons/dzDeltaVsTrackEta_50p0"] = muonDir.make<TH2D> ("dzDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["muons/ptDeltaVsTrackEta_100p0"] = muonDir.make<TH2D> ("ptDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["muons/d0DeltaVsTrackEta_100p0"] = muonDir.make<TH2D> ("d0DeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["muons/dzDeltaVsTrackEta_100p0"] = muonDir.make<TH2D> ("dzDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
   twoDHists_["muons/bpixXErrorVsTrackEta"] = muonDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
   twoDHists_["muons/bpixYErrorVsTrackEta"] = muonDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
   twoDHists_["muons/fpixXErrorVsTrackEta"] = muonDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
@@ -197,6 +231,21 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   twoDHists_["chargedHadrons/ptErrorVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("ptErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
   twoDHists_["chargedHadrons/d0ErrorVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("d0ErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
   twoDHists_["chargedHadrons/dzErrorVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("dzErrorVsTrackEta_100p0", ";track |#eta|;track #sigma_{d_{z}} [cm]", 1000, 0.0, 5.0, dzErrorBins.size () - 1, dzErrorBins.data ());
+  twoDHists_["chargedHadrons/ptDeltaVsTrackEta_0p7"] = chargedHadronDir.make<TH2D> ("ptDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["chargedHadrons/d0DeltaVsTrackEta_0p7"] = chargedHadronDir.make<TH2D> ("d0DeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["chargedHadrons/dzDeltaVsTrackEta_0p7"] = chargedHadronDir.make<TH2D> ("dzDeltaVsTrackEta_0p7", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["chargedHadrons/ptDeltaVsTrackEta_1p0"] = chargedHadronDir.make<TH2D> ("ptDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["chargedHadrons/d0DeltaVsTrackEta_1p0"] = chargedHadronDir.make<TH2D> ("d0DeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["chargedHadrons/dzDeltaVsTrackEta_1p0"] = chargedHadronDir.make<TH2D> ("dzDeltaVsTrackEta_1p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["chargedHadrons/ptDeltaVsTrackEta_10p0"] = chargedHadronDir.make<TH2D> ("ptDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["chargedHadrons/d0DeltaVsTrackEta_10p0"] = chargedHadronDir.make<TH2D> ("d0DeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["chargedHadrons/dzDeltaVsTrackEta_10p0"] = chargedHadronDir.make<TH2D> ("dzDeltaVsTrackEta_10p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["chargedHadrons/ptDeltaVsTrackEta_50p0"] = chargedHadronDir.make<TH2D> ("ptDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["chargedHadrons/d0DeltaVsTrackEta_50p0"] = chargedHadronDir.make<TH2D> ("d0DeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["chargedHadrons/dzDeltaVsTrackEta_50p0"] = chargedHadronDir.make<TH2D> ("dzDeltaVsTrackEta_50p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
+  twoDHists_["chargedHadrons/ptDeltaVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("ptDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptDeltaBins.size () - 1, ptDeltaBins.data ());
+  twoDHists_["chargedHadrons/d0DeltaVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("d0DeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{0}} [cm]", 1000, 0.0, 5.0, d0DeltaBins.size () - 1, d0DeltaBins.data ());
+  twoDHists_["chargedHadrons/dzDeltaVsTrackEta_100p0"] = chargedHadronDir.make<TH2D> ("dzDeltaVsTrackEta_100p0", ";track |#eta|;track #delta_{d_{z}} [cm]", 1000, 0.0, 5.0, dzDeltaBins.size () - 1, dzDeltaBins.data ());
   twoDHists_["chargedHadrons/bpixXErrorVsTrackEta"] = chargedHadronDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
   twoDHists_["chargedHadrons/bpixYErrorVsTrackEta"] = chargedHadronDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
   twoDHists_["chargedHadrons/fpixXErrorVsTrackEta"] = chargedHadronDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
@@ -371,6 +420,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       double vz = track.vz (),
              pt = track.pt (),
              d0 = track.d0 (),
+             dz = track.dz (),
              eta = track.eta (),
              normalizedChi2 = track.normalizedChi2 (),
              ptError = track.ptError (),
@@ -423,8 +473,18 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       threeDHists_.at ("trackD0Error")->Fill (eta, pt, d0Error);
       threeDHists_.at ("trackDzError")->Fill (eta, pt, dzError);
 
-      if (isMatched (track, genParticles, 11, 0.1))
+      const reco::GenParticle *closestParticle = NULL;
+      const SimTrack *closestTrack = NULL;
+
+      if (isMatched (track, genParticles, 11, 0.1, closestParticle))
         {
+          double genPt = closestParticle->pt (),
+                 genD0 = (closestParticle->vx () * closestParticle->py () - closestParticle->vy () * closestParticle->px ()) / closestParticle->pt (),
+                 genDz = closestParticle->vz () - (closestParticle->vx () * closestParticle->px () + closestParticle->vy () * closestParticle->py ()) / closestParticle->pt () * (closestParticle->pz () / closestParticle->pt ()),
+                 ptDelta = genPt - pt,
+                 d0Delta = genD0 - d0,
+                 dzDelta = genDz - dz;
+
           if (pt > 0.7)
             nElectrons++;
           twoDHists_.at ("electrons/trackEtaVsTrackPt")->Fill (pt, eta);
@@ -434,38 +494,60 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("electrons/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("electrons/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("electrons/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("electrons/ptDeltaVsTrackEta_0p7")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("electrons/d0DeltaVsTrackEta_0p7")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("electrons/dzDeltaVsTrackEta_0p7")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 1.0) / 1.0 < 0.1)
             {
               twoDHists_.at ("electrons/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("electrons/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("electrons/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("electrons/ptDeltaVsTrackEta_1p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("electrons/d0DeltaVsTrackEta_1p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("electrons/dzDeltaVsTrackEta_1p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 10.0) / 10.0 < 0.1)
             {
               twoDHists_.at ("electrons/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("electrons/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("electrons/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("electrons/ptDeltaVsTrackEta_10p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("electrons/d0DeltaVsTrackEta_10p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("electrons/dzDeltaVsTrackEta_10p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 50.0) / 50.0 < 0.1)
             {
               twoDHists_.at ("electrons/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("electrons/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("electrons/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("electrons/ptDeltaVsTrackEta_50p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("electrons/d0DeltaVsTrackEta_50p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("electrons/dzDeltaVsTrackEta_50p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 100.0) / 100.0 < 0.1)
             {
               twoDHists_.at ("electrons/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("electrons/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("electrons/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("electrons/ptDeltaVsTrackEta_100p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("electrons/d0DeltaVsTrackEta_100p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("electrons/dzDeltaVsTrackEta_100p0")->Fill (fabs (eta), dzDelta);
             }
 
           threeDHists_.at ("electrons/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
           threeDHists_.at ("electrons/trackD0Error")->Fill (eta, pt, d0Error);
           threeDHists_.at ("electrons/trackDzError")->Fill (eta, pt, dzError);
         }
-      else if (isMatched (track, genParticles, 13, 0.1))
+      else if (isMatched (track, genParticles, 13, 0.1, closestParticle))
         {
+          double genPt = closestParticle->pt (),
+                 genD0 = (closestParticle->vx () * closestParticle->py () - closestParticle->vy () * closestParticle->px ()) / closestParticle->pt (),
+                 genDz = closestParticle->vz () - (closestParticle->vx () * closestParticle->px () + closestParticle->vy () * closestParticle->py ()) / closestParticle->pt () * (closestParticle->pz () / closestParticle->pt ()),
+                 ptDelta = genPt - pt,
+                 d0Delta = genD0 - d0,
+                 dzDelta = genDz - dz;
+
           if (pt > 0.7)
             nMuons++;
           twoDHists_.at ("muons/trackEtaVsTrackPt")->Fill (pt, eta);
@@ -475,38 +557,66 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("muons/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("muons/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("muons/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("muons/ptDeltaVsTrackEta_0p7")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("muons/d0DeltaVsTrackEta_0p7")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("muons/dzDeltaVsTrackEta_0p7")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 1.0) / 1.0 < 0.1)
             {
               twoDHists_.at ("muons/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("muons/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("muons/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("muons/ptDeltaVsTrackEta_1p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("muons/d0DeltaVsTrackEta_1p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("muons/dzDeltaVsTrackEta_1p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 10.0) / 10.0 < 0.1)
             {
               twoDHists_.at ("muons/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("muons/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("muons/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("muons/ptDeltaVsTrackEta_10p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("muons/d0DeltaVsTrackEta_10p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("muons/dzDeltaVsTrackEta_10p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 50.0) / 50.0 < 0.1)
             {
               twoDHists_.at ("muons/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("muons/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("muons/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("muons/ptDeltaVsTrackEta_50p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("muons/d0DeltaVsTrackEta_50p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("muons/dzDeltaVsTrackEta_50p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 100.0) / 100.0 < 0.1)
             {
               twoDHists_.at ("muons/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("muons/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("muons/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("muons/ptDeltaVsTrackEta_100p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("muons/d0DeltaVsTrackEta_100p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("muons/dzDeltaVsTrackEta_100p0")->Fill (fabs (eta), dzDelta);
             }
 
           threeDHists_.at ("muons/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
           threeDHists_.at ("muons/trackD0Error")->Fill (eta, pt, d0Error);
           threeDHists_.at ("muons/trackDzError")->Fill (eta, pt, dzError);
         }
-      else if (isMatched (track, simTracks, 0.001))
+      else if (isMatched (track, simTracks, 0.001, closestTrack))
         {
+          double genPt = -1.0, genD0 = -1.0, genDz = -1.0, ptDelta = -1.0, d0Delta = -1.0, dzDelta = -1.0;
+
+          if (!closestTrack->noGenpart ())
+            {
+              closestParticle = &(genParticles->at (closestTrack->genpartIndex () - 1));
+              genPt = closestParticle->pt (),
+              genD0 = (closestParticle->vx () * closestParticle->py () - closestParticle->vy () * closestParticle->px ()) / closestParticle->pt (),
+              genDz = closestParticle->vz () - (closestParticle->vx () * closestParticle->px () + closestParticle->vy () * closestParticle->py ()) / closestParticle->pt () * (closestParticle->pz () / closestParticle->pt ()),
+              ptDelta = genPt - pt,
+              d0Delta = genD0 - d0,
+              dzDelta = genDz - dz;
+            }
+
           if (pt > 0.7)
             nChargedHadrons++;
           twoDHists_.at ("chargedHadrons/trackEtaVsTrackPt")->Fill (pt, eta);
@@ -516,30 +626,45 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("chargedHadrons/ptErrorVsTrackEta_0p7")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("chargedHadrons/d0ErrorVsTrackEta_0p7")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("chargedHadrons/dzErrorVsTrackEta_0p7")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("chargedHadrons/ptDeltaVsTrackEta_0p7")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("chargedHadrons/d0DeltaVsTrackEta_0p7")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("chargedHadrons/dzDeltaVsTrackEta_0p7")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 1.0) / 1.0 < 0.1)
             {
               twoDHists_.at ("chargedHadrons/ptErrorVsTrackEta_1p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("chargedHadrons/d0ErrorVsTrackEta_1p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("chargedHadrons/dzErrorVsTrackEta_1p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("chargedHadrons/ptDeltaVsTrackEta_1p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("chargedHadrons/d0DeltaVsTrackEta_1p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("chargedHadrons/dzDeltaVsTrackEta_1p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 10.0) / 10.0 < 0.1)
             {
               twoDHists_.at ("chargedHadrons/ptErrorVsTrackEta_10p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("chargedHadrons/d0ErrorVsTrackEta_10p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("chargedHadrons/dzErrorVsTrackEta_10p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("chargedHadrons/ptDeltaVsTrackEta_10p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("chargedHadrons/d0DeltaVsTrackEta_10p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("chargedHadrons/dzDeltaVsTrackEta_10p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 50.0) / 50.0 < 0.1)
             {
               twoDHists_.at ("chargedHadrons/ptErrorVsTrackEta_50p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("chargedHadrons/d0ErrorVsTrackEta_50p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("chargedHadrons/dzErrorVsTrackEta_50p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("chargedHadrons/ptDeltaVsTrackEta_50p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("chargedHadrons/d0DeltaVsTrackEta_50p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("chargedHadrons/dzDeltaVsTrackEta_50p0")->Fill (fabs (eta), dzDelta);
             }
           if (fabs (pt - 100.0) / 100.0 < 0.1)
             {
               twoDHists_.at ("chargedHadrons/ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
               twoDHists_.at ("chargedHadrons/d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
               twoDHists_.at ("chargedHadrons/dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
+              twoDHists_.at ("chargedHadrons/ptDeltaVsTrackEta_100p0")->Fill (fabs (eta), (ptDelta / genPt) * 100.0);
+              twoDHists_.at ("chargedHadrons/d0DeltaVsTrackEta_100p0")->Fill (fabs (eta), d0Delta);
+              twoDHists_.at ("chargedHadrons/dzDeltaVsTrackEta_100p0")->Fill (fabs (eta), dzDelta);
             }
 
           threeDHists_.at ("chargedHadrons/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
@@ -680,8 +805,10 @@ VFPixAnalyzer::linSpace (const unsigned n, const double a, const double b, vecto
 }
 
 bool
-VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<reco::GenParticle> > &genParticles, const unsigned id, const double maxDeltaR) const
+VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<reco::GenParticle> > &genParticles, const unsigned id, const double maxDeltaR, const reco::GenParticle *&closest) const
 {
+  double minDeltaR = 999.9;
+  closest = NULL;
   for (const auto &genParticle : *genParticles)
     {
       if (abs (genParticle.pdgId ()) != id
@@ -690,25 +817,34 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<rec
         continue;
 
       double dR = deltaR (track, genParticle);
-      if (dR > maxDeltaR)
-        continue;
+      if (dR < minDeltaR)
+        {
+          minDeltaR = dR;
+          closest = &genParticle;
+        }
 
-      return true;
     }
+  if (minDeltaR < maxDeltaR)
+    return true;
   return false;
 }
 
 bool
-VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<SimTrack> > &simTracks, const double maxDeltaR) const
+VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<SimTrack> > &simTracks, const double maxDeltaR, const SimTrack *&closest) const
 {
+  double minDeltaR = 999.9;
+  closest = NULL;
   for (const auto &simTrack : *simTracks)
     {
       double dR = deltaR (track.eta (), track.phi (), simTrack.momentum ().Eta (), simTrack.momentum ().Phi ());
-      if (dR > maxDeltaR)
-        continue;
-
-      return true;
+      if (dR < minDeltaR)
+        {
+          minDeltaR = dR;
+          closest = &simTrack;
+        }
     }
+  if (minDeltaR < maxDeltaR)
+    return true;
   return false;
 }
 
