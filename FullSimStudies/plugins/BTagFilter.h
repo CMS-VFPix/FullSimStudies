@@ -1,5 +1,5 @@
-#ifndef VFPIX_ANALYZER
-#define VFPIX_ANALYZER
+#ifndef BTAG_FILTER
+#define BTAG_FILTER
 
 #include <unordered_map>
 #include <string>
@@ -10,7 +10,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -25,31 +25,31 @@
 
 using namespace std;
 
-class VFPixAnalyzer : public edm::EDAnalyzer
+class BTagFilter : public edm::EDFilter
 {
   public:
-    VFPixAnalyzer (const edm::ParameterSet &);
-    ~VFPixAnalyzer ();
+    BTagFilter (const edm::ParameterSet &);
+    ~BTagFilter ();
 
-    void analyze (const edm::Event &, const edm::EventSetup &);
+    bool filter (edm::Event &, const edm::EventSetup &);
 
   private:
     edm::Service<TFileService> fs_;
-    unordered_map<string, TH1D *> oneDHists_;
-    unordered_map<string, TH2D *> twoDHists_;
-    unordered_map<string, TH3D *> threeDHists_;
+    unordered_map<string, unordered_map<string, TH1D *> > oneDHists_;
+    unordered_map<string, unordered_map<string, TH2D *> > twoDHists_;
+    unordered_map<string, unordered_map<string, TH3D *> > threeDHists_;
 
+    edm::InputTag btags_;
+    edm::InputTag genJets_;
     edm::InputTag jets_;
-    edm::InputTag pus_;
-    edm::InputTag vertices_;
-    edm::InputTag tracks_;
     edm::InputTag genParticles_;
-    edm::InputTag simTracks_;
+    edm::InputTag tracks_;
 
     void logSpace (const unsigned, const double, const double, vector<double> &) const;
     void linSpace (const unsigned, const double, const double, vector<double> &) const;
-    bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
-    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
+    bool passesPUJetID (const reco::PFJet &, const edm::Handle<vector<reco::GenJet> > &) const;
+    double ssv (const reco::PFJet &, const edm::Handle<reco::JetTagCollection> &) const;
+    bool isHighPurity (const reco::Track &) const;
 };
 
 #endif

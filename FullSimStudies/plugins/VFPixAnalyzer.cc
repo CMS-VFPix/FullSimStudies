@@ -52,9 +52,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["jetEta"]   = jetDir.make<TH1D> ("jetEta", ";jet #eta", 1000, -5.0, 5.0);
   oneDHists_["jetPt"]    = jetDir.make<TH1D> ("jetPt", ";jet p_{T} [GeV]", jetPtBins.size () - 1, jetPtBins.data ());
-  oneDHists_["jetBeta"]    = jetDir.make<TH1D> ("jetBeta", ";jet #beta", 1000, 0.0, 1.0);
-
-  twoDHists_["jetBetaVsJetEta"]    = jetDir.make<TH2D> ("jetBetaVsJetEta", ";jet #eta;jet #beta", 500, -5.0, 5.0, 500, 0.0, 1.0);
+  oneDHists_["jetSSV"]   = jetDir.make<TH1D> ("jetSSV", ";jet SSV discriminator", 1000, 0.0, 10.0);
 
   oneDHists_["nPU_bx0"]  = puDir.make<TH1D> ("nPU_bx0", ";number of interactions from current BX", 280, 0.0, 280.0);
   oneDHists_["nPU_bxP1"] = puDir.make<TH1D> ("nPU_bxP1", ";number of interactions from following BX", 280, 0.0, 280.0);
@@ -364,13 +362,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
             {
               double pt = (*track)->pt ();
-              long long id = trackHash (**track);
 
               if (pt < 0.7)
                 continue;
               nTracks++;
               sumPt2 += pt * pt;
-              pvTrackID.insert (id);
             }
           oneDHists_.at ("pvNTracks")->Fill (nTracks);
           oneDHists_.at ("pvSumPt2")->Fill (sumPt2);
@@ -415,7 +411,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
   unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
-  for (const auto &track : *tracks)
+  /*for (const auto &track : *tracks)
     {
       double vz = track.vz (),
              pt = track.pt (),
@@ -714,7 +710,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
 
 
-/*      for (const auto &hit : track.extra ()->recHits ())
+      for (const auto &hit : track.extra ()->recHits ())
         {
           int det = hit->geographicalId ().det (),
               subdetId = hit->geographicalId ().subdetId ();
@@ -733,8 +729,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("fpixXErrorVsTrackEta")->Fill (fabs (eta), xError);
               twoDHists_.at ("fpixYErrorVsTrackEta")->Fill (fabs (eta), yError);
             }
-        }*/
-    }
+        }
+    }*/
   oneDHists_.at ("nTracks")->Fill (nTracks);
   oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
   oneDHists_.at ("muons/nTracks")->Fill (nMuons);
@@ -744,9 +740,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   for (const auto &jet : *jets)
     {
       double pt = jet.pt (),
-             eta = jet.eta (),
-             totalPt = 0.0,
-             pvPt = 0.0;
+             eta = jet.eta ();
 
       if (pt < 100.0)
         continue;
@@ -755,33 +749,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
       oneDHists_.at ("jetPt")->Fill (pt);
       oneDHists_.at ("jetEta")->Fill (eta);
-
-      for (const auto &track : jet.getTrackRefs ())
-        {
-          double pt = track->pt ();
-          long long id = trackHash (*track);
-
-          if (pt < 0.7)
-            continue;
-          totalPt += pt;
-          if (pvTrackID.count (id))
-            pvPt += pt;
-        }
-      oneDHists_.at ("jetBeta")->Fill (pvPt / totalPt);
-      twoDHists_.at ("jetBetaVsJetEta")->Fill (eta, pvPt / totalPt);
     }
-}
-
-long long
-VFPixAnalyzer::trackHash (const reco::Track &track) const
-{
-  stringstream ss0, ss1, ss2;
-
-  ss0 << abs (track.pt () * 1.0e3);
-  ss1 << abs ((track.eta () + 10.0) * 1.0e3);
-  ss2 << abs ((track.phi () + 4.0) * 1.0e3);
-
-  return atoll ((ss0.str () + ss1.str () + ss2.str ()).c_str ());
 }
 
 void
