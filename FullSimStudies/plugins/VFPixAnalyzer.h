@@ -7,8 +7,11 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/JetReco/interface/TrackJet.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -40,6 +43,7 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     unordered_map<string, TH3D *> threeDHists_;
 
     edm::InputTag jets_;
+    edm::InputTag trackJets_;
     edm::InputTag pus_;
     edm::InputTag vertices_;
     edm::InputTag tracks_;
@@ -51,6 +55,7 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
     double beta (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
+    double beta (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
 };
 
 #endif

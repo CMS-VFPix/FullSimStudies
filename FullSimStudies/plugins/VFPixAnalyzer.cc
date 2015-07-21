@@ -5,15 +5,14 @@
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/DetId/interface/DetId.h"
-#include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "VFPix/FullSimStudies/plugins/VFPixAnalyzer.h"
 
 VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   jets_ (cfg.getParameter<edm::InputTag> ("jets")),
+  trackJets_ (cfg.getParameter<edm::InputTag> ("trackJets")),
   pus_ (cfg.getParameter<edm::InputTag> ("pus")),
   vertices_ (cfg.getParameter<edm::InputTag> ("vertices")),
   tracks_ (cfg.getParameter<edm::InputTag> ("tracks")),
@@ -49,7 +48,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
                  muonDir = fs_->mkdir ("muons"),
                  chargedHadronDir = fs_->mkdir ("chargedHadrons"),
                  fakeTrackDir = fs_->mkdir ("fakeTracks"),
-                 pvAssociationFactoredDir = fs_->mkdir ("pvAssociationFactored");
+                 pvAssociationFactoredDir = fs_->mkdir ("pvAssociationFactored"),
+                 pvAssociationFactored_TrackJetsDir = fs_->mkdir ("pvAssociationFactored_TrackJets");
 
   oneDHists_["jetEta"]   = jetDir.make<TH1D> ("jetEta", ";jet #eta", 1000, -5.0, 5.0);
   oneDHists_["jetPt"]    = jetDir.make<TH1D> ("jetPt", ";jet p_{T} [GeV]", jetPtBins.size () - 1, jetPtBins.data ());
@@ -286,6 +286,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored_TrackJets/vbfQuarkEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored_TrackJets/vbfJetsFound"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
 }
 
 VFPixAnalyzer::~VFPixAnalyzer ()
@@ -297,6 +299,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 {
   edm::Handle<vector<reco::PFJet> > jets;
   event.getByLabel (jets_, jets);
+  edm::Handle<vector<reco::TrackJet> > trackJets;
+  event.getByLabel (trackJets_, trackJets);
   edm::Handle<vector<PileupSummaryInfo> > pus;
   event.getByLabel (pus_, pus);
   edm::Handle<vector<reco::Vertex> > vertices;
@@ -798,6 +802,45 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         oneDHists_.at ("pvAssociationFactored/vbfQuarkEta")->Fill (fabs (quark.eta ()));
       if (closestJet)
         oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
+      if (foundAJet && !closestJet && fabs (quark.eta ()) > 2.8 && fabs (quark.eta ()) < 3.0)
+        cout << event.id () << endl;
+    }
+  for (const auto &quark : quarks)
+    {
+      if (quark.pt () < 30.0)
+        continue;
+
+      const reco::TrackJet *closestJet = NULL;
+      double closestJetDeltaR = -1.0;
+      bool foundAJet = false;
+      for (const auto &jet : *trackJets)
+        {
+          double dR, jetBeta;
+
+          if (jet.pt () < 30.0)
+            continue;
+
+          dR = deltaR (quark, jet);
+
+          if (dR > 0.4)
+            continue;
+
+          foundAJet = true;
+
+          if (dR < closestJetDeltaR || !closestJet)
+            {
+              jetBeta = beta (jet, tracks, vertices);
+              if (jetBeta < 0.1)
+                continue;
+
+              closestJetDeltaR = dR;
+              closestJet = &jet;
+            }
+        }
+      if (foundAJet)
+        oneDHists_.at ("pvAssociationFactored_TrackJets/vbfQuarkEta")->Fill (fabs (quark.eta ()));
+      if (closestJet)
+        oneDHists_.at ("pvAssociationFactored_TrackJets/vbfJetsFound")->Fill (fabs (quark.eta ()));
     }
 
   for (const auto &jet : *jets)
@@ -881,6 +924,33 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<Sim
 
 double
 VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices) const
+{
+  double sumptchpv = 0.0, sumptch = 0.0;
+  for (const auto &track : *tracks)
+    {
+      if (track.pt () < 0.7)
+        continue;
+      if (deltaR (track, jet) > 0.4)
+        continue;
+      sumptch += track.pt ();
+    }
+  if (vertices->size () > 0)
+    {
+      for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
+        {
+          if ((*track)->pt () < 0.7)
+            continue;
+          if (deltaR (**track, jet) > 0.4)
+            continue;
+          sumptchpv += (*track)->pt ();
+        }
+    }
+
+  return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
+}
+
+double
+VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices) const
 {
   double sumptchpv = 0.0, sumptch = 0.0;
   for (const auto &track : *tracks)
