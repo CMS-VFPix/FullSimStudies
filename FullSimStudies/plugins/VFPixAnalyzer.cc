@@ -766,6 +766,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         quarks.push_back (particle);
     }
 
+  bool noMatchedVBFQuarks = true;
   for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
@@ -801,10 +802,16 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (foundAJet)
         oneDHists_.at ("pvAssociationFactored/vbfQuarkEta")->Fill (fabs (quark.eta ()));
       if (closestJet)
-        oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
-      if (foundAJet && !closestJet && fabs (quark.eta ()) > 2.8 && fabs (quark.eta ()) < 3.0)
-        cout << event.id () << endl;
+	{
+	  oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
+	  noMatchedVBFQuarks = false;
+	}
+      //      if (foundAJet && !closestJet && fabs (quark.eta ()) > 2.8 && fabs (quark.eta ()) < 3.0)
+      //        cout << event.id () << endl;
     }
+  if (noMatchedVBFQuarks)
+    cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;
+
   for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
