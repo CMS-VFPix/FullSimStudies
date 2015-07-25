@@ -930,6 +930,14 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
     {
       if (track.pt () < 0.7)
         continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (track.d0 () / track.d0Error () > 5.0)
+        continue;
       if (deltaR (track, jet) > 0.4)
         continue;
       sumptch += track.pt ();
@@ -939,6 +947,14 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
       for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
         {
           if ((*track)->pt () < 0.7)
+            continue;
+          if ((*track)->normalizedChi2 () > 20.0)
+            continue;
+          if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
+            continue;
+          if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
+            continue;
+          if ((*track)->d0 () / (*track)->d0Error () > 5.0)
             continue;
           if (deltaR (**track, jet) > 0.4)
             continue;
@@ -957,6 +973,14 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
     {
       if (track.pt () < 0.7)
         continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (track.d0 () / track.d0Error () > 5.0)
+        continue;
       if (deltaR (track, jet) > 0.4)
         continue;
       sumptch += track.pt ();
@@ -966,6 +990,14 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
       for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
         {
           if ((*track)->pt () < 0.7)
+            continue;
+          if ((*track)->normalizedChi2 () > 20.0)
+            continue;
+          if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
+            continue;
+          if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
+            continue;
+          if ((*track)->d0 () / (*track)->d0Error () > 5.0)
             continue;
           if (deltaR (**track, jet) > 0.4)
             continue;
