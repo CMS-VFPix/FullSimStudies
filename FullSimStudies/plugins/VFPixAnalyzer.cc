@@ -855,7 +855,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       double pt = jet.pt (),
              eta = jet.eta ();
 
-      if (pt < 100.0)
+      if (pt < 30.0)
         continue;
       if (fabs (eta) > 5.0)
         continue;
