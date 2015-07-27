@@ -89,11 +89,11 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   twoDHists_["nVerticesVsNPU"] = vertexDir.make<TH2D> ("nVerticesVsNPU", ";number of interactions;number of primary vertices", 280, 0.0, 280.0, 280, 0.0, 280.0);
 
-  oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
-  oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
-  oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
+  //oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  //oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  //oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
-  twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
+  /*twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
   twoDHists_["ptErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
   twoDHists_["d0ErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
@@ -282,7 +282,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   threeDHists_["fakeTracks/trackPtError"] = fakeTrackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
   threeDHists_["fakeTracks/trackD0Error"] = fakeTrackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
-  threeDHists_["fakeTracks/trackDzError"] = fakeTrackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["fakeTracks/trackDzError"] = fakeTrackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());*/
 
   oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
@@ -418,8 +418,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
     }
   twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
-  unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
-  /*for (const auto &track : *tracks)
+  /*unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
+  for (const auto &track : *tracks)
     {
       double vz = track.vz (),
              pt = track.pt (),
@@ -739,11 +739,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             }
         }
     }*/
-  oneDHists_.at ("nTracks")->Fill (nTracks);
+  /*oneDHists_.at ("nTracks")->Fill (nTracks);
   oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
   oneDHists_.at ("muons/nTracks")->Fill (nMuons);
   oneDHists_.at ("chargedHadrons/nTracks")->Fill (nChargedHadrons);
-  oneDHists_.at ("fakeTracks/nTracks")->Fill (nFakeTracks);
+  oneDHists_.at ("fakeTracks/nTracks")->Fill (nFakeTracks);*/
 
   vector<reco::GenParticle> quarks;
   for (const auto &particle : *genParticles)
@@ -892,7 +892,7 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<rec
   closest = NULL;
   for (const auto &genParticle : *genParticles)
     {
-      if (abs (genParticle.pdgId ()) != id
+      if (abs (genParticle.pdgId ()) != (int) id
        || genParticle.status () != 1
        || genParticle.numberOfDaughters () != 0)
         continue;
