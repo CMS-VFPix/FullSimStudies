@@ -54,6 +54,7 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     void linSpace (const unsigned, const double, const double, vector<double> &) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double) const;
     double beta (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
     double beta (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
 };

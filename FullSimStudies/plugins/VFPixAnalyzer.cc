@@ -86,6 +86,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvNTracks"] = vertexDir.make<TH1D> ("pvNTracks", ";primary vertex number of tracks", 500, 0.0, 500.0);
   oneDHists_["pvTrackPt"] = vertexDir.make<TH1D> ("pvTrackPt", ";primary vertex track p_{T} [GeV}", vertexTrackPtBins.size () - 1, vertexTrackPtBins.data ());
   oneDHists_["pvSumPt2"] = vertexDir.make<TH1D> ("pvSumPt2", ";primary vertex #sump_{T}^{2} [GeV^{2}]", vertexPt2Bins.size () - 1, vertexPt2Bins.data ());
+  oneDHists_["genPVIndex"] = vertexDir.make<TH1D> ("genPVIndex", ";index of gen-matched PV", 100, 0.0, 100.0);
 
   twoDHists_["nVerticesVsNPU"] = vertexDir.make<TH2D> ("nVerticesVsNPU", ";number of interactions;number of primary vertices", 280, 0.0, 280.0, 280, 0.0, 280.0);
 
@@ -286,8 +287,10 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored/jetBeta"] = pvAssociationFactoredDir.make<TH1D> ("jetBeta", ";VBF jet #beta|", 100, 0.0, 1.0);
   oneDHists_["pvAssociationFactored_TrackJets/vbfQuarkEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_TrackJets/vbfJetsFound"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored_TrackJets/jetBeta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.0);
 }
 
 VFPixAnalyzer::~VFPixAnalyzer ()
@@ -381,6 +384,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
     }
   unsigned nVertices = 0;
+  unordered_map<unsigned, double> genSumPt2;
+  double maxGenSumPt2 = 0.0;
+  unsigned maxGenSumPt2Index = 0;
   for (const auto &vertex : *vertices)
     {
       double x = vertex.x (),
@@ -403,6 +409,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       oneDHists_.at ("vertexZError")->Fill (ez);
       oneDHists_.at ("vertexNDF")->Fill (ndf);
 
+      genSumPt2[nVertices] = 0.0;
       for (auto track = vertex.tracks_begin (); track != vertex.tracks_end (); track++)
         {
           double pt = (*track)->pt ();
@@ -411,11 +418,20 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             continue;
           nTracks++;
           sumPt2 += pt * pt;
+
+          if (isMatched (**track, simTracks, 0.01))
+            genSumPt2.at (nVertices) += pt * pt;
+        }
+      if (genSumPt2.at (nVertices) > maxGenSumPt2)
+        {
+          maxGenSumPt2 = genSumPt2.at (nVertices);
+          maxGenSumPt2Index = nVertices;
         }
       oneDHists_.at ("vertexNTracks")->Fill (nTracks);
       oneDHists_.at ("vertexSumPt2")->Fill (sumPt2);
       nVertices++;
     }
+  oneDHists_.at ("genPVIndex")->Fill (maxGenSumPt2Index);
   twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
   /*unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
@@ -772,8 +788,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (quark.pt () < 30.0)
         continue;
 
-      const reco::PFJet *closestJet = NULL;
-      double closestJetDeltaR = -1.0;
+      const reco::PFJet *closestJet = NULL, *tmpJet = NULL;
+      double closestJetDeltaR = -1.0, tmpJetDeltaR = -1.0;
       bool foundAJet = false;
       for (const auto &jet : *jets)
         {
@@ -789,6 +805,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           foundAJet = true;
 
+          if (dR < tmpJetDeltaR || !tmpJet)
+            {
+              tmpJetDeltaR = dR;
+              tmpJet = &jet;
+            }
+
           if (dR < closestJetDeltaR || !closestJet)
             {
               jetBeta = beta (jet, tracks, vertices);
@@ -802,12 +824,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (foundAJet)
         oneDHists_.at ("pvAssociationFactored/vbfQuarkEta")->Fill (fabs (quark.eta ()));
       if (closestJet)
-	{
-	  oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
-	  noMatchedVBFQuarks = false;
-	}
-      //      if (foundAJet && !closestJet && fabs (quark.eta ()) > 2.8 && fabs (quark.eta ()) < 3.0)
-      //        cout << event.id () << endl;
+        {
+          oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
+          noMatchedVBFQuarks = false;
+        }
+      if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
+        oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
     }
   if (noMatchedVBFQuarks)
     cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;
@@ -817,8 +839,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (quark.pt () < 30.0)
         continue;
 
-      const reco::TrackJet *closestJet = NULL;
-      double closestJetDeltaR = -1.0;
+      const reco::TrackJet *closestJet = NULL, *tmpJet = NULL;
+      double closestJetDeltaR = -1.0, tmpJetDeltaR = -1.0;
       bool foundAJet = false;
       for (const auto &jet : *trackJets)
         {
@@ -834,6 +856,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           foundAJet = true;
 
+          if (dR < tmpJetDeltaR || !tmpJet)
+            {
+              tmpJetDeltaR = dR;
+              tmpJet = &jet;
+            }
           if (dR < closestJetDeltaR || !closestJet)
             {
               jetBeta = beta (jet, tracks, vertices);
@@ -848,6 +875,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         oneDHists_.at ("pvAssociationFactored_TrackJets/vbfQuarkEta")->Fill (fabs (quark.eta ()));
       if (closestJet)
         oneDHists_.at ("pvAssociationFactored_TrackJets/vbfJetsFound")->Fill (fabs (quark.eta ()));
+      if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
+        oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
     }
 
   for (const auto &jet : *jets)
@@ -926,6 +955,18 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<Sim
     }
   if (minDeltaR < maxDeltaR)
     return true;
+  return false;
+}
+
+bool
+VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<SimTrack> > &simTracks, const double maxDeltaR) const
+{
+  for (const auto &simTrack : *simTracks)
+    {
+      double dR = deltaR (track.eta (), track.phi (), simTrack.momentum ().Eta (), simTrack.momentum ().Phi ());
+      if (dR < maxDeltaR)
+        return true;
+    }
   return false;
 }
 
