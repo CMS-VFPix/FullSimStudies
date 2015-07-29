@@ -38,9 +38,6 @@ process = cms.Process ('VFPIX')
 process.load ('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
-process.TFileService = cms.Service ('TFileService',
-  fileName = cms.string (outputFile + str (jobNumber) + ".root")
-)
 process.maxEvents = cms.untracked.PSet (
   input = cms.untracked.int32 (-1)
 )
