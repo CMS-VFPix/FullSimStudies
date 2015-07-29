@@ -21,6 +21,10 @@ if scenario == "trkExt":
   files = fileNames.trkExt
   outputFile = "/afs/cern.ch/user/a/ahart/T3/VBFHToTauTau_trkExt"
   print "using the scenario with the tracker extension..."
+if scenario == "trkExt_HToMuMu":
+  files = fileNames.trkExt_HToMuMu
+  outputFile = "/afs/cern.ch/user/a/ahart/T3/VBFHToMuMu_trkExt"
+  print "using the HToMuMu scenario with the tracker extension..."
 
 filesPerJob = int (math.ceil (len (files) / float (nJobs)))
 files = files[(jobNumber * filesPerJob):((jobNumber + 1) * filesPerJob)]
