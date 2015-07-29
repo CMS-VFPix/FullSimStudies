@@ -55,8 +55,12 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double) const;
-    double beta (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
-    double beta (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &) const;
+    double beta (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, unsigned = 0) const;
+    double betaStar (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, unsigned = 0) const;
+    double beta (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, unsigned = 0) const;
+    double betaStar (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, unsigned = 0) const;
+    void fillTrackHistograms (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const reco::Vertex &) const;
+    void fillTrackHistograms (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const reco::Vertex &) const;
 };
 
 #endif

@@ -287,10 +287,25 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
-  oneDHists_["pvAssociationFactored/jetBeta"] = pvAssociationFactoredDir.make<TH1D> ("jetBeta", ";VBF jet #beta|", 100, 0.0, 1.0);
+  oneDHists_["pvAssociationFactored/jetBeta"] = pvAssociationFactoredDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored/jetBetaStar"] = pvAssociationFactoredDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored/jetTrackDz"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
+  oneDHists_["pvAssociationFactored/jetTrackDxy"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
+  oneDHists_["pvAssociationFactored/jetTrackDzSig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored/jetTrackDxySig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+
+  twoDHists_["pvAssociationFactored/jetBetaVsGenBeta"] = pvAssociationFactoredDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
+
   oneDHists_["pvAssociationFactored_TrackJets/vbfQuarkEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_TrackJets/vbfJetsFound"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
-  oneDHists_["pvAssociationFactored_TrackJets/jetBeta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.0);
+  oneDHists_["pvAssociationFactored_TrackJets/jetBeta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored_TrackJets/jetBetaStar"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored_TrackJets/jetTrackDz"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
+  oneDHists_["pvAssociationFactored_TrackJets/jetTrackDxy"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
+  oneDHists_["pvAssociationFactored_TrackJets/jetTrackDzSig"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored_TrackJets/jetTrackDxySig"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+
+  twoDHists_["pvAssociationFactored_TrackJets/jetBetaVsGenBeta"] = pvAssociationFactored_TrackJetsDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 1.01);
 }
 
 VFPixAnalyzer::~VFPixAnalyzer ()
@@ -419,8 +434,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           nTracks++;
           sumPt2 += pt * pt;
 
-          if (isMatched (**track, simTracks, 0.01))
-            genSumPt2.at (nVertices) += pt * pt;
+          //if (isMatched (**track, simTracks, 0.01))
+          //  genSumPt2.at (nVertices) += pt * pt;
         }
       if (genSumPt2.at (nVertices) > maxGenSumPt2)
         {
@@ -829,7 +844,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           noMatchedVBFQuarks = false;
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
-        oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+        {
+          oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
+          twoDHists_.at ("pvAssociationFactored/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
+        }
     }
   if (noMatchedVBFQuarks)
     cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;
@@ -876,7 +896,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (closestJet)
         oneDHists_.at ("pvAssociationFactored_TrackJets/vbfJetsFound")->Fill (fabs (quark.eta ()));
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
-        oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+        {
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
+          twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
+        }
     }
 
   for (const auto &jet : *jets)
@@ -971,7 +996,7 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<Sim
 }
 
 double
-VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices) const
+VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
 {
   double sumptchpv = 0.0, sumptch = 0.0;
   for (const auto &track : *tracks)
@@ -984,7 +1009,7 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
         continue;
       if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
         continue;
-      if (track.d0 () / track.d0Error () > 5.0)
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -992,7 +1017,7 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
     }
   if (vertices->size () > 0)
     {
-      for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
+      for (auto track = vertices->at (vertexIndex).tracks_begin (); track != vertices->at (vertexIndex).tracks_end (); track++)
         {
           if ((*track)->pt () < 0.7)
             continue;
@@ -1002,7 +1027,7 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
             continue;
           if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
             continue;
-          if ((*track)->d0 () / (*track)->d0Error () > 5.0)
+          if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
             continue;
           if (deltaR (**track, jet) > 0.4)
             continue;
@@ -1014,7 +1039,48 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
 }
 
 double
-VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices) const
+VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+{
+  double sumptchpu = 0.0, sumptch = 0.0;
+  for (const auto &track : *tracks)
+    {
+      if (track.pt () < 0.7)
+        continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+        continue;
+      if (deltaR (track, jet) > 0.4)
+        continue;
+      sumptch += track.pt ();
+
+      if (vertices->size () > 0)
+        {
+          unsigned iVertex = 0;
+          bool fromOtherVertex = false;
+          for (const auto vertex : *vertices)
+            {
+              if ((iVertex++) == vertexIndex)
+                continue;
+              for (auto pvTrack = vertex.tracks_begin (); !fromOtherVertex && pvTrack != vertex.tracks_end (); pvTrack++)
+                fromOtherVertex = (deltaR (track, **pvTrack) < 1.0e-12);
+              if (fromOtherVertex)
+                break;
+            }
+          if (!fromOtherVertex)
+            sumptchpu += track.pt ();
+        }
+    }
+
+  return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
+}
+
+double
+VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
 {
   double sumptchpv = 0.0, sumptch = 0.0;
   for (const auto &track : *tracks)
@@ -1027,7 +1093,7 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
         continue;
       if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
         continue;
-      if (track.d0 () / track.d0Error () > 5.0)
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -1035,7 +1101,7 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
     }
   if (vertices->size () > 0)
     {
-      for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
+      for (auto track = vertices->at (vertexIndex).tracks_begin (); track != vertices->at (vertexIndex).tracks_end (); track++)
         {
           if ((*track)->pt () < 0.7)
             continue;
@@ -1045,7 +1111,7 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
             continue;
           if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
             continue;
-          if ((*track)->d0 () / (*track)->d0Error () > 5.0)
+          if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
             continue;
           if (deltaR (**track, jet) > 0.4)
             continue;
@@ -1054,6 +1120,97 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
     }
 
   return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
+}
+
+double
+VFPixAnalyzer::betaStar (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+{
+  double sumptchpu = 0.0, sumptch = 0.0;
+  for (const auto &track : *tracks)
+    {
+      if (track.pt () < 0.7)
+        continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+        continue;
+      if (deltaR (track, jet) > 0.4)
+        continue;
+      sumptch += track.pt ();
+
+      if (vertices->size () > 0)
+        {
+          unsigned iVertex = 0;
+          bool fromOtherVertex = false;
+          for (const auto vertex : *vertices)
+            {
+              if ((iVertex++) == vertexIndex)
+                continue;
+              for (auto pvTrack = vertex.tracks_begin (); !fromOtherVertex && pvTrack != vertex.tracks_end (); pvTrack++)
+                fromOtherVertex = (deltaR (track, **pvTrack) < 1.0e-12);
+              if (fromOtherVertex)
+                break;
+            }
+          if (!fromOtherVertex)
+            sumptchpu += track.pt ();
+        }
+    }
+
+  return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
+}
+
+void
+VFPixAnalyzer::fillTrackHistograms (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const reco::Vertex &pv) const
+{
+  for (const auto &track : *tracks)
+    {
+      if (track.pt () < 0.7)
+        continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+        continue;
+      if (deltaR (track, jet) > 0.4)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored/jetTrackDz")->Fill (track.dz (pv.position ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDxy")->Fill (track.dxy (pv.position ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDzSig")->Fill (track.dz (pv.position ()) / hypot (track.dzError (), pv.zError ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDxySig")->Fill (track.dxy (pv.position ()) / hypot (track.dxyError (), hypot (pv.xError (), pv.yError ())), track.pt ());
+    }
+}
+
+void
+VFPixAnalyzer::fillTrackHistograms (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const reco::Vertex &pv) const
+{
+  for (const auto &track : *tracks)
+    {
+      if (track.pt () < 0.7)
+        continue;
+      if (track.normalizedChi2 () > 20.0)
+        continue;
+      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+        continue;
+      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+        continue;
+      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+        continue;
+      if (deltaR (track, jet) > 0.4)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored/jetTrackDz")->Fill (track.dz (pv.position ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDxy")->Fill (track.dxy (pv.position ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDzSig")->Fill (track.dz (pv.position ()) / hypot (track.dzError (), pv.zError ()), track.pt ());
+      oneDHists_.at ("pvAssociationFactored/jetTrackDxySig")->Fill (track.dxy (pv.position ()) / hypot (track.dxyError (), hypot (pv.xError (), pv.yError ())), track.pt ());
+    }
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
