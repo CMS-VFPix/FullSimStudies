@@ -1,4 +1,4 @@
-noTrkExt = [
+noTrkExt = [ # /VBF_HToTauTau_M-125_14TeV-powheg-pythia6/TP2023HGCALNoTRKExtDR-PU140BX25_PH2_1K_FB_V6-v3/GEN-SIM-RECO
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALNoTRKExtDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/PU140BX25_PH2_1K_FB_V6-v3/10000/0294B51A-7F1A-E511-9BB3-008CFA197454.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALNoTRKExtDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/PU140BX25_PH2_1K_FB_V6-v3/10000/029F7648-991A-E511-A291-008CFA111310.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALNoTRKExtDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/PU140BX25_PH2_1K_FB_V6-v3/10000/046790A4-6D1A-E511-AF64-008CFA197BDC.root',
@@ -282,7 +282,7 @@ noTrkExt = [
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALNoTRKExtDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/PU140BX25_PH2_1K_FB_V6-v3/70000/FE98F273-2E1A-E511-9705-0002C90F80DA.root',
 ]
 
-trkExt = [
+trkExt = [ # /VBF_HToTauTau_M-125_14TeV-powheg-pythia6/TP2023HGCALDR-HGCALnewsplit_PU140BX25_newsplitPU140_PH2_1K_FB_V6-v2/GEN-SIM-RECO
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALnewsplit_PU140BX25_newsplitPU140_PH2_1K_FB_V6-v2/00000/02BD6259-AEF9-E411-8447-00A0D1EEF204.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALnewsplit_PU140BX25_newsplitPU140_PH2_1K_FB_V6-v2/00000/04698117-DBF6-E411-99E9-1CC1DE1CED22.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALnewsplit_PU140BX25_newsplitPU140_PH2_1K_FB_V6-v2/00000/046EF567-AFF9-E411-B78D-00266CF9B3FC.root',
@@ -595,7 +595,7 @@ trkExt = [
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToTauTau_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALnewsplit_PU140BX25_newsplitPU140_PH2_1K_FB_V6-v2/00000/FE5EB922-5FF9-E411-BCD9-001E67398BE7.root',
 ]
 
-trkExt_HToMuMu = [
+trkExt_HToMuMu = [ # /VBF_HToMuMu_M-125_14TeV-powheg-pythia6/TP2023HGCALDR-HGCALMar26_PU140BX25_PH2_1K_FB_V6-v2/GEN-SIM-RECO
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToMuMu_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALMar26_PU140BX25_PH2_1K_FB_V6-v2/00000/063B935A-69EA-E411-A71C-0025905C9740.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToMuMu_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALMar26_PU140BX25_PH2_1K_FB_V6-v2/00000/085F564E-69EA-E411-920D-0025905C42F4.root',
   'root://cms-xrd-global.cern.ch///store/mc/TP2023HGCALDR/VBF_HToMuMu_M-125_14TeV-powheg-pythia6/GEN-SIM-RECO/HGCALMar26_PU140BX25_PH2_1K_FB_V6-v2/00000/0A2570B7-32EA-E411-A38E-485B39800BBF.root',
