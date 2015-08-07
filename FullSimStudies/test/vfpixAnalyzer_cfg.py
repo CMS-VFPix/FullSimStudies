@@ -5,11 +5,8 @@ import math
 import VFPix.FullSimStudies.fileNames_cfg as fileNames
 
 jobNumber = int (sys.argv[2])
-#jobNumber = 0
 nJobs = int (sys.argv[3])
-#nJobs = 8
 scenario = sys.argv[4]
-#scenario = "noTrkExt"
 
 files = []
 outputFile = ""
@@ -94,11 +91,22 @@ process.ak4PFCHSJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
     correctors  = cms.vstring('ak4PFCHSL1FastL2L3')
 )
 
+process.delphesVertices = cms.EDProducer ('DelphesVertexProducer',
+  tracks = cms.InputTag ("generalTracks", ""),
+  sigma = cms.double (2.0),
+  minPT = cms.double (0.7),
+  maxEta = cms.double (10.0),
+  seedMinPT = cms.double (0.7),
+  minNDF = cms.int32 (4),
+  growSeeds = cms.int32 (1),
+)
+
 process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
   trackJets = cms.InputTag ("ak5TrackJets", ""),
   pus = cms.InputTag ("addPileupInfo", ""),
   vertices = cms.InputTag ("offlinePrimaryVertices", ""),
+  #vertices = cms.InputTag ("delphesVertices", ""),
   tracks = cms.InputTag ("generalTracks", ""),
   genParticles = cms.InputTag ("genParticles", ""),
   simTracks = cms.InputTag ("g4SimHits", ""),
