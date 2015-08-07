@@ -49,6 +49,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
                  chargedHadronDir = fs_->mkdir ("chargedHadrons"),
                  fakeTrackDir = fs_->mkdir ("fakeTracks"),
                  pvAssociationFactoredDir = fs_->mkdir ("pvAssociationFactored"),
+                 pvAssociationFactored15Dir = fs_->mkdir ("pvAssociationFactored15"),
+                 pvAssociationFactored20Dir = fs_->mkdir ("pvAssociationFactored20"),
                  pvAssociationFactored_BetaStarDir = fs_->mkdir ("pvAssociationFactored_BetaStar"),
                  pvAssociationFactored_TrackJetsDir = fs_->mkdir ("pvAssociationFactored_TrackJets");
 
@@ -287,15 +289,49 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   threeDHists_["fakeTracks/trackDzError"] = fakeTrackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());*/
 
   oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored/nVertices"] = pvAssociationFactoredDir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored/vbfJetsFound_nVertices"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored/jetBeta"] = pvAssociationFactoredDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored/jetBetaStar"] = pvAssociationFactoredDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored/jetTrackDz"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored/jetTrackDxy"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored/jetTrackDzSig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
   oneDHists_["pvAssociationFactored/jetTrackDxySig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored/fakeJetEta"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored/goodJetEta"] = pvAssociationFactoredDir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
 
   twoDHists_["pvAssociationFactored/jetBetaVsGenBeta"] = pvAssociationFactoredDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
+
+  oneDHists_["pvAssociationFactored15/vbfQuarkEta"] = pvAssociationFactored15Dir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored15/nVertices"] = pvAssociationFactored15Dir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
+  oneDHists_["pvAssociationFactored15/vbfJetsFound"] = pvAssociationFactored15Dir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored15/vbfJetsFound_nVertices"] = pvAssociationFactored15Dir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
+  oneDHists_["pvAssociationFactored15/jetBeta"] = pvAssociationFactored15Dir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored15/jetBetaStar"] = pvAssociationFactored15Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored15/jetTrackDz"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
+  oneDHists_["pvAssociationFactored15/jetTrackDxy"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
+  oneDHists_["pvAssociationFactored15/jetTrackDzSig"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored15/jetTrackDxySig"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored15/fakeJetEta"] = pvAssociationFactored15Dir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored15/goodJetEta"] = pvAssociationFactored15Dir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+
+  twoDHists_["pvAssociationFactored15/jetBetaVsGenBeta"] = pvAssociationFactored15Dir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
+
+  oneDHists_["pvAssociationFactored20/vbfQuarkEta"] = pvAssociationFactored20Dir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored20/nVertices"] = pvAssociationFactored20Dir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
+  oneDHists_["pvAssociationFactored20/vbfJetsFound"] = pvAssociationFactored20Dir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored20/vbfJetsFound_nVertices"] = pvAssociationFactored20Dir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
+  oneDHists_["pvAssociationFactored20/jetBeta"] = pvAssociationFactored20Dir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored20/jetBetaStar"] = pvAssociationFactored20Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored20/jetTrackDz"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
+  oneDHists_["pvAssociationFactored20/jetTrackDxy"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
+  oneDHists_["pvAssociationFactored20/jetTrackDzSig"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored20/jetTrackDxySig"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored20/fakeJetEta"] = pvAssociationFactored20Dir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored20/goodJetEta"] = pvAssociationFactored20Dir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+
+  twoDHists_["pvAssociationFactored20/jetBetaVsGenBeta"] = pvAssociationFactored20Dir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
 
   oneDHists_["pvAssociationFactored_BetaStar/vbfQuarkEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_BetaStar/vbfJetsFound"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
@@ -808,8 +844,17 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (isVBFquark)
         quarks.push_back (particle);
     }
+  vector<reco::GenParticle> taus;
+  for (const auto &particle : *genParticles)
+    {
+      if (particle.status () != 3)
+        break;
+      if (abs (particle.pdgId ()) != 15)
+        continue;
+      taus.push_back (particle);
+    }
 
-  bool noMatchedVBFQuarks = true;
+  //bool noMatchedVBFQuarks = true;
   for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
@@ -849,22 +894,243 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             }
         }
       if (foundAJet)
-        oneDHists_.at ("pvAssociationFactored/vbfQuarkEta")->Fill (fabs (quark.eta ()));
+        {
+          oneDHists_.at ("pvAssociationFactored/vbfQuarkEta")->Fill (fabs (quark.eta ()));
+          oneDHists_.at ("pvAssociationFactored/nVertices")->Fill (vertices->size ());
+        }
       if (closestJet)
         {
           oneDHists_.at ("pvAssociationFactored/vbfJetsFound")->Fill (fabs (quark.eta ()));
-          noMatchedVBFQuarks = false;
+          oneDHists_.at ("pvAssociationFactored/vbfJetsFound_nVertices")->Fill (vertices->size ());
+          //noMatchedVBFQuarks = false;
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
           oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
           oneDHists_.at ("pvAssociationFactored/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
           twoDHists_.at ("pvAssociationFactored/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
-          fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
+          //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
-  if (noMatchedVBFQuarks)
-    cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;
+  /*if (noMatchedVBFQuarks)
+    cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;*/
+
+  for (const auto &quark : quarks)
+    {
+      if (quark.pt () < 30.0)
+        continue;
+
+      const reco::PFJet *closestJet = NULL, *tmpJet = NULL;
+      double closestJetDeltaR = -1.0, tmpJetDeltaR = -1.0;
+      bool foundAJet = false;
+      for (const auto &jet : *jets)
+        {
+          double dR, jetBeta;
+
+          if (jet.pt () < 30.0)
+            continue;
+
+          dR = deltaR (quark, jet);
+
+          if (dR > 0.4)
+            continue;
+
+          foundAJet = true;
+
+          if (dR < tmpJetDeltaR || !tmpJet)
+            {
+              tmpJetDeltaR = dR;
+              tmpJet = &jet;
+            }
+
+          if (dR < closestJetDeltaR || !closestJet)
+            {
+              jetBeta = beta (jet, tracks, vertices);
+              if (jetBeta < 0.15)
+                continue;
+
+              closestJetDeltaR = dR;
+              closestJet = &jet;
+            }
+        }
+      if (foundAJet)
+        {
+          oneDHists_.at ("pvAssociationFactored15/vbfQuarkEta")->Fill (fabs (quark.eta ()));
+          oneDHists_.at ("pvAssociationFactored15/nVertices")->Fill (vertices->size ());
+        }
+      if (closestJet)
+        {
+          oneDHists_.at ("pvAssociationFactored15/vbfJetsFound")->Fill (fabs (quark.eta ()));
+          oneDHists_.at ("pvAssociationFactored15/vbfJetsFound_nVertices")->Fill (vertices->size ());
+        }
+      if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
+        {
+          oneDHists_.at ("pvAssociationFactored15/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored15/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
+          twoDHists_.at ("pvAssociationFactored15/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+        }
+    }
+
+  for (const auto &quark : quarks)
+    {
+      if (quark.pt () < 30.0)
+        continue;
+
+      const reco::PFJet *closestJet = NULL, *tmpJet = NULL;
+      double closestJetDeltaR = -1.0, tmpJetDeltaR = -1.0;
+      bool foundAJet = false;
+      for (const auto &jet : *jets)
+        {
+          double dR, jetBeta;
+
+          if (jet.pt () < 30.0)
+            continue;
+
+          dR = deltaR (quark, jet);
+
+          if (dR > 0.4)
+            continue;
+
+          foundAJet = true;
+
+          if (dR < tmpJetDeltaR || !tmpJet)
+            {
+              tmpJetDeltaR = dR;
+              tmpJet = &jet;
+            }
+
+          if (dR < closestJetDeltaR || !closestJet)
+            {
+              jetBeta = beta (jet, tracks, vertices);
+              if (jetBeta < 0.2)
+                continue;
+
+              closestJetDeltaR = dR;
+              closestJet = &jet;
+            }
+        }
+      if (foundAJet)
+        {
+          oneDHists_.at ("pvAssociationFactored20/vbfQuarkEta")->Fill (fabs (quark.eta ()));
+          oneDHists_.at ("pvAssociationFactored20/nVertices")->Fill (vertices->size ());
+        }
+      if (closestJet)
+        {
+          oneDHists_.at ("pvAssociationFactored20/vbfJetsFound")->Fill (fabs (quark.eta ()));
+          oneDHists_.at ("pvAssociationFactored20/vbfJetsFound_nVertices")->Fill (vertices->size ());
+        }
+      if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
+        {
+          oneDHists_.at ("pvAssociationFactored20/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored20/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
+          twoDHists_.at ("pvAssociationFactored20/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+        }
+    }
+
+  for (const auto &jet : *jets)
+    {
+      double dR, jetBeta;
+
+      if (jet.pt () < 30.0)
+        continue;
+
+      bool isMatched = false;
+      for (const auto &quark : quarks)
+        {
+          dR = deltaR (jet, quark);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      for (const auto &tau : taus)
+        {
+          dR = deltaR (jet, tau);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+
+      if (isMatched)
+        break;
+
+      oneDHists_.at ("pvAssociationFactored/fakeJetEta")->Fill (fabs (jet.eta ()));
+      jetBeta = beta (jet, tracks, vertices);
+
+      if (jetBeta < 0.1)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored/goodJetEta")->Fill (fabs (jet.eta ()));
+    }
+
+  for (const auto &jet : *jets)
+    {
+      double dR, jetBeta;
+
+      if (jet.pt () < 30.0)
+        continue;
+
+      bool isMatched = false;
+      for (const auto &quark : quarks)
+        {
+          dR = deltaR (jet, quark);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      for (const auto &tau : taus)
+        {
+          dR = deltaR (jet, tau);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+
+      if (isMatched)
+        break;
+
+      oneDHists_.at ("pvAssociationFactored15/fakeJetEta")->Fill (fabs (jet.eta ()));
+      jetBeta = beta (jet, tracks, vertices);
+
+      if (jetBeta < 0.15)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored15/goodJetEta")->Fill (fabs (jet.eta ()));
+    }
+
+  for (const auto &jet : *jets)
+    {
+      double dR, jetBeta;
+
+      if (jet.pt () < 30.0)
+        continue;
+
+      bool isMatched = false;
+      for (const auto &quark : quarks)
+        {
+          dR = deltaR (jet, quark);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      for (const auto &tau : taus)
+        {
+          dR = deltaR (jet, tau);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+
+      if (isMatched)
+        break;
+
+      oneDHists_.at ("pvAssociationFactored20/fakeJetEta")->Fill (fabs (jet.eta ()));
+      jetBeta = beta (jet, tracks, vertices);
+
+      if (jetBeta < 0.2)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored20/goodJetEta")->Fill (fabs (jet.eta ()));
+    }
 
   for (const auto &quark : quarks)
     {
@@ -909,7 +1175,6 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (closestJet)
         {
           oneDHists_.at ("pvAssociationFactored_BetaStar/vbfJetsFound")->Fill (fabs (quark.eta ()));
-          noMatchedVBFQuarks = false;
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
@@ -965,7 +1230,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
           oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
           twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
-          fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
+          //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
 
