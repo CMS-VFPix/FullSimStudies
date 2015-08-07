@@ -1042,6 +1042,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
+      if (isMatched)
+        continue;
       for (const auto &tau : taus)
         {
           dR = deltaR (jet, tau);
@@ -1049,9 +1051,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
-
       if (isMatched)
-        break;
+        continue;
 
       oneDHists_.at ("pvAssociationFactored/fakeJetEta")->Fill (fabs (jet.eta ()));
       jetBeta = beta (jet, tracks, vertices);
@@ -1077,6 +1078,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
+      if (isMatched)
+        continue;
       for (const auto &tau : taus)
         {
           dR = deltaR (jet, tau);
@@ -1084,9 +1087,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
-
       if (isMatched)
-        break;
+        continue;
 
       oneDHists_.at ("pvAssociationFactored15/fakeJetEta")->Fill (fabs (jet.eta ()));
       jetBeta = beta (jet, tracks, vertices);
@@ -1112,6 +1114,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
+      if (isMatched)
+        continue;
       for (const auto &tau : taus)
         {
           dR = deltaR (jet, tau);
@@ -1119,9 +1123,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           if ((isMatched = (dR < 0.4)))
             break;
         }
-
       if (isMatched)
-        break;
+        continue;
 
       oneDHists_.at ("pvAssociationFactored20/fakeJetEta")->Fill (fabs (jet.eta ()));
       jetBeta = beta (jet, tracks, vertices);
