@@ -45,6 +45,16 @@ process.source = cms.Source ('PoolSource',
   fileNames = cms.untracked.vstring (files)
 )
 
+process.load ("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
+process.load ('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
+process.load ('Configuration.Geometry.GeometryExtended2023Muon_cff')
+process.load ("Configuration.StandardSequences.MagneticField_cff")
+process.load ('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'DES23_62_V1::All'
+
+from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import *
+process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(jets = "ak5CaloJets")
+
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 process.jec = cms.ESSource("PoolDBESSource",
@@ -91,6 +101,26 @@ process.ak4PFCHSJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
     correctors  = cms.vstring('ak4PFCHSL1FastL2L3')
 )
 
+process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
+  jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
+  trackJets = cms.InputTag ("ak5TrackJets", ""),
+  pus = cms.InputTag ("addPileupInfo", ""),
+  vertices = cms.InputTag ("offlinePrimaryVertices", ""),
+  tracks = cms.InputTag ("generalTracks", ""),
+  genParticles = cms.InputTag ("genParticles", ""),
+  simTracks = cms.InputTag ("g4SimHits", ""),
+)
+
+process.VFPixAnalyzerWithSortedPVs = cms.EDAnalyzer ('VFPixAnalyzer',
+  jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
+  trackJets = cms.InputTag ("ak5TrackJets", ""),
+  pus = cms.InputTag ("addPileupInfo", ""),
+  vertices = cms.InputTag ("betterOfflinePrimaryVertices", ""),
+  tracks = cms.InputTag ("generalTracks", ""),
+  genParticles = cms.InputTag ("genParticles", ""),
+  simTracks = cms.InputTag ("g4SimHits", ""),
+)
+
 process.delphesVertices = cms.EDProducer ('DelphesVertexProducer',
   tracks = cms.InputTag ("generalTracks", ""),
   sigma = cms.double (2.0),
@@ -101,15 +131,14 @@ process.delphesVertices = cms.EDProducer ('DelphesVertexProducer',
   growSeeds = cms.int32 (1),
 )
 
-process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
+process.VFPixAnalyzerWithDelphesVertices = cms.EDAnalyzer ('VFPixAnalyzer',
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
   trackJets = cms.InputTag ("ak5TrackJets", ""),
   pus = cms.InputTag ("addPileupInfo", ""),
-  vertices = cms.InputTag ("offlinePrimaryVertices", ""),
-  #vertices = cms.InputTag ("delphesVertices", ""),
+  vertices = cms.InputTag ("delphesVertices", ""),
   tracks = cms.InputTag ("generalTracks", ""),
   genParticles = cms.InputTag ("genParticles", ""),
   simTracks = cms.InputTag ("g4SimHits", ""),
 )
 
-process.myPath = cms.Path (process.ak4PFCHSJetsL1FastL2L3*process.VFPixAnalyzer)
+process.myPath = cms.Path (process.betterOfflinePrimaryVertices*process.ak4PFCHSJetsL1FastL2L3*process.VFPixAnalyzer*process.VFPixAnalyzerWithSortedPVs*process.delphesVertices*process.VFPixAnalyzerWithDelphesVertices)
