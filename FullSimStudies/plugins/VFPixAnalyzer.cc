@@ -352,6 +352,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDxy"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDzSig"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDxySig"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored_TrackJets/fakeJetEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored_TrackJets/goodJetEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
 
   twoDHists_["pvAssociationFactored_TrackJets/jetBetaVsGenBeta"] = pvAssociationFactored_TrackJetsDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 1.01);
 }
@@ -824,6 +826,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   oneDHists_.at ("chargedHadrons/nTracks")->Fill (nChargedHadrons);
   oneDHists_.at ("fakeTracks/nTracks")->Fill (nFakeTracks);*/
 
+////////////////////////////////////////////////////////////////////////////////
+// Find the VBF quarks in the genParticles list.
+////////////////////////////////////////////////////////////////////////////////
   vector<reco::GenParticle> quarks;
   for (const auto &particle : *genParticles)
     {
@@ -844,6 +849,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       if (isVBFquark)
         quarks.push_back (particle);
     }
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// Find any status 3 taus that may be in the genParticles list.
+////////////////////////////////////////////////////////////////////////////////
   vector<reco::GenParticle> taus;
   for (const auto &particle : *genParticles)
     {
@@ -853,7 +863,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
       taus.push_back (particle);
     }
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Calculation of PV association efficiency.
+////////////////////////////////////////////////////////////////////////////////
   //bool noMatchedVBFQuarks = true;
   for (const auto &quark : quarks)
     {
@@ -1026,7 +1040,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("pvAssociationFactored20/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
         }
     }
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Calculation of PV association fake rate.
+////////////////////////////////////////////////////////////////////////////////
   for (const auto &jet : *jets)
     {
       double dR, jetBeta;
@@ -1134,7 +1152,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
       oneDHists_.at ("pvAssociationFactored20/goodJetEta")->Fill (fabs (jet.eta ()));
     }
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Calculation of PV association efficiency using beta* instead of beta.
+////////////////////////////////////////////////////////////////////////////////
   for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
@@ -1186,7 +1208,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("pvAssociationFactored_BetaStar/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
         }
     }
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Calculation of PV association efficiency using track jets instead of PF
+// jets.
+////////////////////////////////////////////////////////////////////////////////
   for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
@@ -1236,6 +1263,47 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// Calculation of PV association fake rate using track jets instead of PF jets.
+////////////////////////////////////////////////////////////////////////////////
+  for (const auto &jet : *trackJets)
+    {
+      double dR, jetBeta;
+
+      if (jet.pt () < 30.0)
+        continue;
+
+      bool isMatched = false;
+      for (const auto &quark : quarks)
+        {
+          dR = deltaR (jet, quark);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      if (isMatched)
+        continue;
+      for (const auto &tau : taus)
+        {
+          dR = deltaR (jet, tau);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      if (isMatched)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored_TrackJets/fakeJetEta")->Fill (fabs (jet.eta ()));
+      jetBeta = beta (jet, tracks, vertices);
+
+      if (jetBeta < 0.1)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored_TrackJets/goodJetEta")->Fill (fabs (jet.eta ()));
+    }
+////////////////////////////////////////////////////////////////////////////////
 
   for (const auto &jet : *jets)
     {
