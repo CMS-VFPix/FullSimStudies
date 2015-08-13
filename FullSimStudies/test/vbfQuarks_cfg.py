@@ -2,6 +2,31 @@ import FWCore.ParameterSet.Config as cms
 import sys
 import math
 
+import VFPix.FullSimStudies.fileNames_cfg as fileNames
+
+jobNumber = int (sys.argv[2])
+nJobs = int (sys.argv[3])
+scenario = sys.argv[4]
+
+files = []
+outputFile = ""
+if scenario == "noTrkExt":
+  files = fileNames.noTrkExt
+  outputFile = "vbfHToTauTau_noTrkExt_events"
+  print "using the scenario without the tracker extension..."
+if scenario == "trkExt":
+  files = fileNames.trkExt
+  outputFile = "vbfHToTauTau_trkExt_events"
+  print "using the scenario with the tracker extension..."
+if scenario == "trkExt_HToMuMu":
+  files = fileNames.trkExt_HToMuMu
+  outputFile = "vbfHToMuMu_trkExt_events"
+  print "using the HToMuMu scenario with the tracker extension..."
+
+filesPerJob = int (math.ceil (len (files) / float (nJobs)))
+files = files[(jobNumber * filesPerJob):((jobNumber + 1) * filesPerJob)]
+print "job " + str (jobNumber) + "/" + str (nJobs) + " will process " + str (len (files)) + " files..."
+
 ###########################################################
 ##### Set up process #####
 ###########################################################
@@ -14,7 +39,7 @@ process.maxEvents = cms.untracked.PSet (
   input = cms.untracked.int32 (-1)
 )
 process.source = cms.Source ('PoolSource',
-  fileNames = cms.untracked.vstring ("file:T3/FullContent_VBFHToTauTau_trkExt_skimmed.root")
+  fileNames = cms.untracked.vstring (files)
 )
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
@@ -67,12 +92,13 @@ process.VBFQuarkProducer = cms.EDProducer ('VBFQuarkProducer',
   genParticles = cms.InputTag ("genParticles", ""),
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
   tracks = cms.InputTag ("generalTracks", ""),
+  vertices = cms.InputTag ("offlinePrimaryVertices", ""),
 )
 
 process.PoolOutputModule = cms.OutputModule ("PoolOutputModule",
   splitLevel = cms.untracked.int32 (0),
   eventAutoFlushCompressedSize = cms.untracked.int32 (5242880),
-  fileName = cms.untracked.string ("/afs/cern.ch/user/a/ahart/T3/FullContent_VBFHToTauTau_trkExt_skimmed.root"),
+  fileName = cms.untracked.string ("/afs/cern.ch/user/a/ahart/work/" + outputFile + str (jobNumber) + ".root"),
   outputCommands = cms.untracked.vstring (
     'keep *',
   ),
