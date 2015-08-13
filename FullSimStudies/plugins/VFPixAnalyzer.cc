@@ -20,7 +20,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks"))
 {
   vector<double> jetPtBins, trackPtBins, fineTrackPtBins, vertexPt2Bins, vertexTrackPtBins, ptErrorBins, d0ErrorBins, dzErrorBins, xErrorBins, yErrorBins, trackErrorPtBins, trackErrorBins, trackEtaBins,
-                 ptDeltaBins, d0DeltaBins, dzDeltaBins, trackDeltaPtBins, trackDeltaBins;
+                 ptDeltaBins, d0DeltaBins, dzDeltaBins, trackDeltaPtBins, trackDeltaBins, sumPtChBins;
   logSpace  (1000,  0.0,   4.0,  jetPtBins);
   logSpace  (100,   -1.0,  1.0,  trackPtBins);
   logSpace  (1000,  -1.0,  3.0,  fineTrackPtBins);
@@ -36,6 +36,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   logSpace  (1000,  -5.0,  1.0,  yErrorBins);
   logSpace  (100,   -1.0,  3.0,  trackErrorPtBins);
   logSpace  (1000,  -6.0,  6.0,  trackErrorBins);
+  logSpace  (100,  -1.0, 2.0, sumPtChBins);
 
   linSpace  (50,    0.0,   5.0,  trackEtaBins);
 
@@ -92,6 +93,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["genPVIndex"] = vertexDir.make<TH1D> ("genPVIndex", ";index of gen-matched PV", 100, 0.0, 100.0);
 
   twoDHists_["nVerticesVsNPU"] = vertexDir.make<TH2D> ("nVerticesVsNPU", ";number of interactions;number of primary vertices", 280, 0.0, 280.0, 280, 0.0, 280.0);
+  twoDHists_["pvSumPt2VsGenSumPt2"] = vertexDir.make<TH2D> ("pvSumPt2VsGenSumPt2", ";generated #sump_{T}^{2} [GeV^{2}];primary vertex #sump_{T}^{2} [GeV^{2}]", vertexPt2Bins.size () - 1, vertexPt2Bins.data (), vertexPt2Bins.size () - 1, vertexPt2Bins.data ());
 
   //oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   //oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
@@ -293,22 +295,27 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound_nVertices"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored/jetBeta"] = pvAssociationFactoredDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
-  oneDHists_["pvAssociationFactored/jetBetaStar"] = pvAssociationFactoredDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored/jetBetaStar"] = pvAssociationFactoredDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored/jetTrackDz"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored/jetTrackDxy"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored/jetTrackDzSig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
   oneDHists_["pvAssociationFactored/jetTrackDxySig"] = pvAssociationFactoredDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
   oneDHists_["pvAssociationFactored/fakeJetEta"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/goodJetEta"] = pvAssociationFactoredDir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored/fakeJetBeta"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetBeta", ";fake jet #beta", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored/fakeJetBetaStar"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetBetaStar", ";fake jet #beta*", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored/fakeJetSumPtCh"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetSumPtCh", ";fake jet #sump_{T} [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
+  oneDHists_["pvAssociationFactored/fakeJetSumPtChPV"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetSumPtChPV", ";fake jet #sump_{T} from PV [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
+  oneDHists_["pvAssociationFactored/fakeJetSumPtChPU"] = pvAssociationFactoredDir.make<TH1D> ("fakeJetSumPtChPU", ";fake jet #sump_{T} from PU [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
 
   twoDHists_["pvAssociationFactored/jetBetaVsGenBeta"] = pvAssociationFactoredDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
 
-  oneDHists_["pvAssociationFactored15/vbfQuarkEta"] = pvAssociationFactored15Dir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  /*oneDHists_["pvAssociationFactored15/vbfQuarkEta"] = pvAssociationFactored15Dir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored15/nVertices"] = pvAssociationFactored15Dir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored15/vbfJetsFound"] = pvAssociationFactored15Dir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored15/vbfJetsFound_nVertices"] = pvAssociationFactored15Dir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored15/jetBeta"] = pvAssociationFactored15Dir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
-  oneDHists_["pvAssociationFactored15/jetBetaStar"] = pvAssociationFactored15Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored15/jetBetaStar"] = pvAssociationFactored15Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored15/jetTrackDz"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored15/jetTrackDxy"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored15/jetTrackDzSig"] = pvAssociationFactored15Dir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
@@ -323,7 +330,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationFactored20/vbfJetsFound"] = pvAssociationFactored20Dir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored20/vbfJetsFound_nVertices"] = pvAssociationFactored20Dir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored20/jetBeta"] = pvAssociationFactored20Dir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
-  oneDHists_["pvAssociationFactored20/jetBetaStar"] = pvAssociationFactored20Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored20/jetBetaStar"] = pvAssociationFactored20Dir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored20/jetTrackDz"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored20/jetTrackDxy"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored20/jetTrackDzSig"] = pvAssociationFactored20Dir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
@@ -331,23 +338,25 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationFactored20/fakeJetEta"] = pvAssociationFactored20Dir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored20/goodJetEta"] = pvAssociationFactored20Dir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
 
-  twoDHists_["pvAssociationFactored20/jetBetaVsGenBeta"] = pvAssociationFactored20Dir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
+  twoDHists_["pvAssociationFactored20/jetBetaVsGenBeta"] = pvAssociationFactored20Dir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);*/
 
   oneDHists_["pvAssociationFactored_BetaStar/vbfQuarkEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_BetaStar/vbfJetsFound"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_BetaStar/jetBeta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
-  oneDHists_["pvAssociationFactored_BetaStar/jetBetaStar"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored_BetaStar/jetBetaStar"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored_BetaStar/jetTrackDz"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored_BetaStar/jetTrackDxy"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored_BetaStar/jetTrackDzSig"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
   oneDHists_["pvAssociationFactored_BetaStar/jetTrackDxySig"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetTrackDxySig", ";d_{xy} / #sigma_{d_{xy}} (PV)", 100, -10.0, 10.0);
+  oneDHists_["pvAssociationFactored_BetaStar/fakeJetEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pvAssociationFactored_BetaStar/goodJetEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
 
   twoDHists_["pvAssociationFactored_BetaStar/jetBetaVsGenBeta"] = pvAssociationFactored_BetaStarDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);
 
   oneDHists_["pvAssociationFactored_TrackJets/vbfQuarkEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_TrackJets/vbfJetsFound"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_TrackJets/jetBeta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
-  oneDHists_["pvAssociationFactored_TrackJets/jetBetaStar"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta^{*}", 100, 0.0, 1.01);
+  oneDHists_["pvAssociationFactored_TrackJets/jetBetaStar"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDz"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDz", ";d_{z} (PV) [cm]", 100, -1.0, 1.0);
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDxy"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDxy", ";d_{xy} (PV) [cm]", 100, -0.1, 0.1);
   oneDHists_["pvAssociationFactored_TrackJets/jetTrackDzSig"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("jetTrackDzSig", ";d_{z} / #sigma_{d_{z}} (PV)", 100, -10.0, 10.0);
@@ -380,6 +389,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   edm::Handle<vector<SimTrack> > simTracks;
   event.getByLabel (simTracks_, simTracks);
 
+  double sumptch, sumptchpv, sumptchpu;
   double nPU_bx0 = 0.0;
   for (const auto &pu : *pus)
     {
@@ -437,20 +447,25 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
             {
-              double pt = (*track)->pt ();
-
-              if (pt < 0.7)
+              if ((*track)->pt () < 0.7)
+                continue;
+              if ((*track)->normalizedChi2 () > 20.0)
+                continue;
+              if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
+                continue;
+              if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
+                continue;
+              if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
                 continue;
               nTracks++;
-              sumPt2 += pt * pt;
+              sumPt2 += (*track)->pt () * (*track)->pt ();
             }
           oneDHists_.at ("pvNTracks")->Fill (nTracks);
           oneDHists_.at ("pvSumPt2")->Fill (sumPt2);
+          twoDHists_.at ("pvSumPt2VsGenSumPt2")->Fill (genSumPt2 (*genParticles), sumPt2);
         }
     }
   unsigned nVertices = 0;
-  unordered_map<unsigned, double> genSumPt2;
-  double maxGenSumPt2 = 0.0;
   unsigned maxGenSumPt2Index = 0;
   for (const auto &vertex : *vertices)
     {
@@ -474,7 +489,6 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       oneDHists_.at ("vertexZError")->Fill (ez);
       oneDHists_.at ("vertexNDF")->Fill (ndf);
 
-      genSumPt2[nVertices] = 0.0;
       for (auto track = vertex.tracks_begin (); track != vertex.tracks_end (); track++)
         {
           double pt = (*track)->pt ();
@@ -483,14 +497,6 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             continue;
           nTracks++;
           sumPt2 += pt * pt;
-
-          //if (isMatched (**track, simTracks, 0.01))
-          //  genSumPt2.at (nVertices) += pt * pt;
-        }
-      if (genSumPt2.at (nVertices) > maxGenSumPt2)
-        {
-          maxGenSumPt2 = genSumPt2.at (nVertices);
-          maxGenSumPt2Index = nVertices;
         }
       oneDHists_.at ("vertexNTracks")->Fill (nTracks);
       oneDHists_.at ("vertexSumPt2")->Fill (sumPt2);
@@ -852,16 +858,16 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-// Find any status 3 taus that may be in the genParticles list.
+// Find any status 3 leptons that may be in the genParticles list.
 ////////////////////////////////////////////////////////////////////////////////
-  vector<reco::GenParticle> taus;
+  vector<reco::GenParticle> leptons;
   for (const auto &particle : *genParticles)
     {
       if (particle.status () != 3)
         break;
-      if (abs (particle.pdgId ()) != 15)
+      if (abs (particle.pdgId ()) != 13 && abs (particle.pdgId ()) != 15)
         continue;
-      taus.push_back (particle);
+      leptons.push_back (particle);
     }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -899,7 +905,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBeta = beta (jet, tracks, vertices);
+              jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
               if (jetBeta < 0.1)
                 continue;
 
@@ -920,16 +926,16 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
-          oneDHists_.at ("pvAssociationFactored/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
-          twoDHists_.at ("pvAssociationFactored/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
           //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
   /*if (noMatchedVBFQuarks)
     cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;*/
 
-  for (const auto &quark : quarks)
+  /*for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
         continue;
@@ -959,7 +965,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBeta = beta (jet, tracks, vertices);
+              jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
               if (jetBeta < 0.15)
                 continue;
 
@@ -979,9 +985,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored15/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
-          oneDHists_.at ("pvAssociationFactored15/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
-          twoDHists_.at ("pvAssociationFactored15/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored15/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored15/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored15/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
         }
     }
 
@@ -1015,7 +1021,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBeta = beta (jet, tracks, vertices);
+              jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
               if (jetBeta < 0.2)
                 continue;
 
@@ -1035,11 +1041,11 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored20/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
-          oneDHists_.at ("pvAssociationFactored20/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
-          twoDHists_.at ("pvAssociationFactored20/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored20/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored20/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored20/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
         }
-    }
+    }*/
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1047,7 +1053,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 ////////////////////////////////////////////////////////////////////////////////
   for (const auto &jet : *jets)
     {
-      double dR, jetBeta;
+      double dR, jetBeta, jetBetaStar;
 
       if (jet.pt () < 30.0)
         continue;
@@ -1062,9 +1068,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (isMatched)
         continue;
-      for (const auto &tau : taus)
+      for (const auto &lepton : leptons)
         {
-          dR = deltaR (jet, tau);
+          dR = deltaR (jet, lepton);
 
           if ((isMatched = (dR < 0.4)))
             break;
@@ -1073,7 +1079,14 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored/fakeJetEta")->Fill (fabs (jet.eta ()));
-      jetBeta = beta (jet, tracks, vertices);
+      jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
+      jetBetaStar = betaStar (jet, tracks, vertices, sumptch, sumptchpu);
+
+      oneDHists_.at ("pvAssociationFactored/fakeJetBeta")->Fill (jetBeta);
+      oneDHists_.at ("pvAssociationFactored/fakeJetBetaStar")->Fill (jetBetaStar);
+      oneDHists_.at ("pvAssociationFactored/fakeJetSumPtCh")->Fill (sumptch);
+      oneDHists_.at ("pvAssociationFactored/fakeJetSumPtChPV")->Fill (sumptchpv);
+      oneDHists_.at ("pvAssociationFactored/fakeJetSumPtChPU")->Fill (sumptchpu);
 
       if (jetBeta < 0.1)
         continue;
@@ -1081,7 +1094,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
       oneDHists_.at ("pvAssociationFactored/goodJetEta")->Fill (fabs (jet.eta ()));
     }
 
-  for (const auto &jet : *jets)
+  /*for (const auto &jet : *jets)
     {
       double dR, jetBeta;
 
@@ -1098,9 +1111,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (isMatched)
         continue;
-      for (const auto &tau : taus)
+      for (const auto &lepton : leptons)
         {
-          dR = deltaR (jet, tau);
+          dR = deltaR (jet, lepton);
 
           if ((isMatched = (dR < 0.4)))
             break;
@@ -1109,7 +1122,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored15/fakeJetEta")->Fill (fabs (jet.eta ()));
-      jetBeta = beta (jet, tracks, vertices);
+      jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
 
       if (jetBeta < 0.15)
         continue;
@@ -1134,9 +1147,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (isMatched)
         continue;
-      for (const auto &tau : taus)
+      for (const auto &lepton : leptons)
         {
-          dR = deltaR (jet, tau);
+          dR = deltaR (jet, lepton);
 
           if ((isMatched = (dR < 0.4)))
             break;
@@ -1145,13 +1158,13 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored20/fakeJetEta")->Fill (fabs (jet.eta ()));
-      jetBeta = beta (jet, tracks, vertices);
+      jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
 
       if (jetBeta < 0.2)
         continue;
 
       oneDHists_.at ("pvAssociationFactored20/goodJetEta")->Fill (fabs (jet.eta ()));
-    }
+    }*/
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1187,7 +1200,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBetaStar = betaStar (jet, tracks, vertices);
+              jetBetaStar = betaStar (jet, tracks, vertices, sumptch, sumptchpu);
               if (jetBetaStar > 0.9 || jetBetaStar < -1.0)
                 continue;
 
@@ -1203,10 +1216,46 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored_BetaStar/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
-          oneDHists_.at ("pvAssociationFactored_BetaStar/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
-          twoDHists_.at ("pvAssociationFactored_BetaStar/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored_BetaStar/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored_BetaStar/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored_BetaStar/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
         }
+    }
+
+  for (const auto &jet : *jets)
+    {
+      double dR, jetBetaStar;
+
+      if (jet.pt () < 30.0)
+        continue;
+
+      bool isMatched = false;
+      for (const auto &quark : quarks)
+        {
+          dR = deltaR (jet, quark);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      if (isMatched)
+        continue;
+      for (const auto &lepton : leptons)
+        {
+          dR = deltaR (jet, lepton);
+
+          if ((isMatched = (dR < 0.4)))
+            break;
+        }
+      if (isMatched)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored_BetaStar/fakeJetEta")->Fill (fabs (jet.eta ()));
+      jetBetaStar = betaStar (jet, tracks, vertices, sumptch, sumptchpu);
+
+      if (jetBetaStar > 0.9 || jetBetaStar < -1.0)
+        continue;
+
+      oneDHists_.at ("pvAssociationFactored_BetaStar/goodJetEta")->Fill (fabs (jet.eta ()));
     }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1243,7 +1292,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             }
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBeta = beta (jet, tracks, vertices);
+              jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
               if (jetBeta < 0.1)
                 continue;
 
@@ -1257,9 +1306,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         oneDHists_.at ("pvAssociationFactored_TrackJets/vbfJetsFound")->Fill (fabs (quark.eta ()));
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices));
-          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices));
-          twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices));
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
           //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
@@ -1285,9 +1334,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
       if (isMatched)
         continue;
-      for (const auto &tau : taus)
+      for (const auto &lepton : leptons)
         {
-          dR = deltaR (jet, tau);
+          dR = deltaR (jet, lepton);
 
           if ((isMatched = (dR < 0.4)))
             break;
@@ -1296,7 +1345,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored_TrackJets/fakeJetEta")->Fill (fabs (jet.eta ()));
-      jetBeta = beta (jet, tracks, vertices);
+      jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
 
       if (jetBeta < 0.1)
         continue;
@@ -1397,9 +1446,9 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<Sim
 }
 
 double
-VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
 {
-  double sumptchpv = 0.0, sumptch = 0.0;
+  sumptchpv = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
       if (track.pt () < 0.7)
@@ -1440,9 +1489,9 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
 }
 
 double
-VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
 {
-  double sumptchpu = 0.0, sumptch = 0.0;
+  sumptchpu = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
       if (track.pt () < 0.7)
@@ -1481,9 +1530,9 @@ VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::
 }
 
 double
-VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
 {
-  double sumptchpv = 0.0, sumptch = 0.0;
+  sumptchpv = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
       if (track.pt () < 0.7)
@@ -1524,9 +1573,9 @@ VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::T
 }
 
 double
-VFPixAnalyzer::betaStar (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, unsigned vertexIndex) const
+VFPixAnalyzer::betaStar (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
 {
-  double sumptchpu = 0.0, sumptch = 0.0;
+  sumptchpu = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
       if (track.pt () < 0.7)
@@ -1612,6 +1661,25 @@ VFPixAnalyzer::fillTrackHistograms (const reco::TrackJet &jet, const edm::Handle
       oneDHists_.at ("pvAssociationFactored/jetTrackDzSig")->Fill (track.dz (pv.position ()) / hypot (track.dzError (), pv.zError ()), track.pt ());
       oneDHists_.at ("pvAssociationFactored/jetTrackDxySig")->Fill (track.dxy (pv.position ()) / hypot (track.dxyError (), hypot (pv.xError (), pv.yError ())), track.pt ());
     }
+}
+
+double
+VFPixAnalyzer::genSumPt2 (const vector<reco::GenParticle> &genParticles) const
+{
+  double sumPt2 = 0.0;
+
+  for (const auto &particle : genParticles)
+    {
+      if (particle.status () != 1)
+        continue;
+      if (particle.pt () < 0.7)
+        continue;
+      if (particle.charge ())
+        continue;
+      sumPt2 += particle.pt () * particle.pt ();
+    }
+
+  return sumPt2;
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
