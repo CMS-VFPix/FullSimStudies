@@ -43,6 +43,7 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     unordered_map<string, TH3D *> threeDHists_;
 
     edm::InputTag jets_;
+    edm::InputTag jetsNoCHS_;
     edm::InputTag trackJets_;
     edm::InputTag pus_;
     edm::InputTag vertices_;
@@ -57,6 +58,10 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double) const;
     double beta (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
     double betaStar (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
+    double beta_dz (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    double betaStar_dz (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    double beta_dzSig (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    double betaStar_dzSig (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
     double beta (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
     double betaStar (const reco::TrackJet &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
     void fillTrackHistograms (const reco::PFJet &, const edm::Handle<vector<reco::Track> > &, const reco::Vertex &) const;
