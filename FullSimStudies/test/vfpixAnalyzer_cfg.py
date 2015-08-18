@@ -63,11 +63,16 @@ process.jec = cms.ESSource("PoolDBESSource",
         ),
       timetype = cms.string('runnumber'),
       toGet = cms.VPSet(
-      cms.PSet(
-            record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_PhaseII_HGCal140PU_AK4PFchs'),
-            label  = cms.untracked.string('AK4PFchs')
-            ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag    = cms.string('JetCorrectorParametersCollection_PhaseII_HGCal140PU_AK4PFchs'),
+          label  = cms.untracked.string('AK4PFchs')
+        ),
+        cms.PSet(
+          record = cms.string('JetCorrectionsRecord'),
+          tag    = cms.string('JetCorrectorParametersCollection_PhaseII_HGCal140PU_AK4PF'),
+          label  = cms.untracked.string('AK4PF')
+        ),
       ## here you add as many jet types as you need
       ## note that the tag name is specific for the particular sqlite file 
       ), 
@@ -101,8 +106,32 @@ process.ak4PFCHSJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
     correctors  = cms.vstring('ak4PFCHSL1FastL2L3')
 )
 
+process.ak4PFL1Fastjet = cms.ESProducer("L1FastjetCorrectionESProducer",
+    srcRho = cms.InputTag("kt6PFJets","rho"),
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L1FastJet')
+)
+process.ak4PFL2Relative = cms.ESProducer("LXXXCorrectionESProducer",
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L2Relative')
+)
+process.ak4PFL3Absolute = cms.ESProducer("LXXXCorrectionESProducer",
+    algorithm = cms.string('AK4PF'),
+    level = cms.string('L3Absolute')
+)
+process.ak4PFL1FastL2L3 = cms.ESProducer("JetCorrectionESChain",
+    correctors = cms.vstring('ak4PFL1Fastjet', 
+        'ak4PFL2Relative', 
+        'ak4PFL3Absolute')
+)
+process.ak4PFJetsL1FastL2L3   = cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('ak4PFJets'),
+    correctors  = cms.vstring('ak4PFL1FastL2L3')
+)
+
 process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
+  jetsNoCHS = cms.InputTag ("ak4PFJetsL1FastL2L3", ""),
   trackJets = cms.InputTag ("ak5TrackJets", ""),
   pus = cms.InputTag ("addPileupInfo", ""),
   vertices = cms.InputTag ("offlinePrimaryVertices", ""),
@@ -113,6 +142,7 @@ process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
 
 process.VFPixAnalyzerWithSortedPVs = cms.EDAnalyzer ('VFPixAnalyzer',
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
+  jetsNoCHS = cms.InputTag ("ak4PFJetsL1FastL2L3", ""),
   trackJets = cms.InputTag ("ak5TrackJets", ""),
   pus = cms.InputTag ("addPileupInfo", ""),
   vertices = cms.InputTag ("betterOfflinePrimaryVertices", ""),
@@ -133,6 +163,7 @@ process.delphesVertices = cms.EDProducer ('DelphesVertexProducer',
 
 process.VFPixAnalyzerWithDelphesVertices = cms.EDAnalyzer ('VFPixAnalyzer',
   jets = cms.InputTag ("ak4PFCHSJetsL1FastL2L3", ""),
+  jetsNoCHS = cms.InputTag ("ak4PFJetsL1FastL2L3", ""),
   trackJets = cms.InputTag ("ak5TrackJets", ""),
   pus = cms.InputTag ("addPileupInfo", ""),
   vertices = cms.InputTag ("delphesVertices", ""),
@@ -141,4 +172,4 @@ process.VFPixAnalyzerWithDelphesVertices = cms.EDAnalyzer ('VFPixAnalyzer',
   simTracks = cms.InputTag ("g4SimHits", ""),
 )
 
-process.myPath = cms.Path (process.betterOfflinePrimaryVertices*process.ak4PFCHSJetsL1FastL2L3*process.VFPixAnalyzer*process.VFPixAnalyzerWithSortedPVs*process.delphesVertices*process.VFPixAnalyzerWithDelphesVertices)
+process.myPath = cms.Path (process.betterOfflinePrimaryVertices*process.ak4PFCHSJetsL1FastL2L3*process.ak4PFJetsL1FastL2L3*process.VFPixAnalyzer*process.VFPixAnalyzerWithSortedPVs*process.delphesVertices*process.VFPixAnalyzerWithDelphesVertices)
