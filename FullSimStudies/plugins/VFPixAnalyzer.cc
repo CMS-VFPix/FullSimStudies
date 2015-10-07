@@ -18,7 +18,8 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   vertices_ (cfg.getParameter<edm::InputTag> ("vertices")),
   tracks_ (cfg.getParameter<edm::InputTag> ("tracks")),
   genParticles_ (cfg.getParameter<edm::InputTag> ("genParticles")),
-  simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks"))
+  simTracks_ (cfg.getParameter<edm::InputTag> ("simTracks")),
+  pfCandidates_ (cfg.getParameter<edm::InputTag> ("pfCandidates"))
 {
   vector<double> jetPtBins, trackPtBins, fineTrackPtBins, vertexPt2Bins, vertexTrackPtBins, ptErrorBins, d0ErrorBins, dzErrorBins, xErrorBins, yErrorBins, trackErrorPtBins, trackErrorBins, trackEtaBins,
                  ptDeltaBins, d0DeltaBins, dzDeltaBins, trackDeltaPtBins, trackDeltaBins, sumPtChBins;
@@ -104,6 +105,11 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   //oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   //oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
+  oneDHists_["chargedHadronEta"] = trackDir.make<TH1D> ("chargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pfChargedHadronEta"] = trackDir.make<TH1D> ("pfChargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["pfChargedHadronHFEta"] = trackDir.make<TH1D> ("pfChargedHadronHFEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta"] = trackDir.make<TH1D> ("chargedHadronTrackEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+
   /*twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
   twoDHists_["ptErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
@@ -124,13 +130,13 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   twoDHists_["bpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
   twoDHists_["bpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
   twoDHists_["fpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
-  twoDHists_["fpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
+  twoDHists_["fpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());*/
 
-  threeDHists_["trackPtError"] = trackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  /*threeDHists_["trackPtError"] = trackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
   threeDHists_["trackD0Error"] = trackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
-  threeDHists_["trackDzError"] = trackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
+  threeDHists_["trackDzError"] = trackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());*/
 
-  oneDHists_["electrons/bpixHitsVsTrackEta"] = electronDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
+  /*oneDHists_["electrons/bpixHitsVsTrackEta"] = electronDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["electrons/fpixHitsVsTrackEta"] = electronDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   oneDHists_["electrons/nTracks"] = electronDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
@@ -458,6 +464,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   event.getByLabel (genParticles_, genParticles);
   edm::Handle<vector<SimTrack> > simTracks;
   event.getByLabel (simTracks_, simTracks);
+  edm::Handle<vector<reco::PFCandidate> > pfCandidates;
+  event.getByLabel (pfCandidates_, pfCandidates);
 
   double sumptch, sumptchpv, sumptchpu;
   double nPU_bx0 = 0.0;
@@ -517,15 +525,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
           for (auto track = vertices->at (0).tracks_begin (); track != vertices->at (0).tracks_end (); track++)
             {
-              if ((*track)->pt () < 0.7)
-                continue;
-              if ((*track)->normalizedChi2 () > 20.0)
-                continue;
-              if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
-                continue;
-              if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
-                continue;
-              if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
+              if (!isGoodTrack (**track))
                 continue;
               nTracks++;
               sumPt2 += (*track)->pt () * (*track)->pt ();
@@ -575,25 +575,43 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   oneDHists_.at ("genPVIndex")->Fill (maxGenSumPt2Index);
   twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
-  /*unsigned nTracks = 0, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
+  for (const auto &genParticle : *genParticles)
+    {
+      if (genParticle.status () != 1)
+        continue;
+      if (!genParticle.charge ())
+        continue;
+      if (genParticle.pt () < 0.7)
+        continue;
+      if (abs (genParticle.pdgId ()) == 11 || abs (genParticle.pdgId ()) == 13 || abs (genParticle.pdgId ()) == 15)
+        continue;
+      oneDHists_.at ("chargedHadronEta")->Fill (fabs (genParticle.eta ()));
+
+      bool isHF = false;
+      if (isMatchedToTrack (genParticle, *tracks, 0.01))
+        oneDHists_.at ("chargedHadronTrackEta")->Fill (fabs (genParticle.eta ()));
+      if (isMatchedToPFChargedHadron (genParticle, *pfCandidates, 0.01, isHF))
+        {
+          if (isHF)
+            oneDHists_.at ("pfChargedHadronHFEta")->Fill (fabs (genParticle.eta ()));
+          else
+            oneDHists_.at ("pfChargedHadronEta")->Fill (fabs (genParticle.eta ()));
+        }
+    }
+
+  /*unsigned nTracks = 0; //, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
   for (const auto &track : *tracks)
     {
       double vz = track.vz (),
              pt = track.pt (),
              d0 = track.d0 (),
-             dz = track.dz (),
+             //dz = track.dz (),
              eta = track.eta (),
-             normalizedChi2 = track.normalizedChi2 (),
              ptError = track.ptError (),
              d0Error = track.d0Error (),
              dzError = track.dzError ();
-      unsigned pixelLayersWithMeasurement = track.hitPattern ().pixelLayersWithMeasurement (),
-               trackerLayersWithMeasurement = track.hitPattern ().trackerLayersWithMeasurement ();
 
-      if (normalizedChi2 > 20.0
-       || pixelLayersWithMeasurement < 2
-       || trackerLayersWithMeasurement < 5
-       || (d0 / d0Error) > 5.0)
+      if (!isGoodTrack (track, false))
         continue;
       if (pt > 0.7)
         nTracks++;
@@ -628,16 +646,16 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
           twoDHists_.at ("d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
           twoDHists_.at ("dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
-        }
+        }*/
 
-      threeDHists_.at ("trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
+      /*threeDHists_.at ("trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
       threeDHists_.at ("trackD0Error")->Fill (eta, pt, d0Error);
       threeDHists_.at ("trackDzError")->Fill (eta, pt, dzError);
 
       const reco::GenParticle *closestParticle = NULL;
-      const SimTrack *closestTrack = NULL;
+      const SimTrack *closestTrack = NULL;*/
 
-      if (isMatched (track, genParticles, 11, 0.1, closestParticle))
+      /*if (isMatched (track, genParticles, 11, 0.1, closestParticle))
         {
           double genPt = closestParticle->pt (),
                  genD0 = (closestParticle->vx () * closestParticle->py () - closestParticle->vy () * closestParticle->px ()) / closestParticle->pt (),
@@ -872,10 +890,10 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           threeDHists_.at ("fakeTracks/trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
           threeDHists_.at ("fakeTracks/trackD0Error")->Fill (eta, pt, d0Error);
           threeDHists_.at ("fakeTracks/trackDzError")->Fill (eta, pt, dzError);
-        }
+        }*/
 
 
-      for (const auto &hit : track.extra ()->recHits ())
+      /*for (const auto &hit : track.extra ()->recHits ())
         {
           int det = hit->geographicalId ().det (),
               subdetId = hit->geographicalId ().subdetId ();
@@ -894,8 +912,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("fpixXErrorVsTrackEta")->Fill (fabs (eta), xError);
               twoDHists_.at ("fpixYErrorVsTrackEta")->Fill (fabs (eta), yError);
             }
-        }
-    }*/
+        }*/
+    //}
   /*oneDHists_.at ("nTracks")->Fill (nTracks);
   oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
   oneDHists_.at ("muons/nTracks")->Fill (nMuons);
@@ -1785,7 +1803,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
             }
           if (dR < closestJetDeltaR || !closestJet)
             {
-              jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
+              jetBeta = beta_dz (jet, tracks, vertices, 0.2, sumptch, sumptchpv);
               if (jetBeta < 0.1)
                 continue;
 
@@ -1799,9 +1817,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         oneDHists_.at ("pvAssociationFactored_TrackJets/vbfJetsFound")->Fill (fabs (quark.eta ()));
       if (tmpJet && fabs (quark.eta ()) > 3.0 && fabs (quark.eta ()) < 4.0)
         {
-          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
-          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar (*tmpJet, tracks, vertices, sumptch, sumptchpu));
-          twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBeta")->Fill (beta_dz (*tmpJet, tracks, vertices, 0.2, sumptch, sumptchpv));
+          oneDHists_.at ("pvAssociationFactored_TrackJets/jetBetaStar")->Fill (betaStar_dz (*tmpJet, tracks, vertices, 0.2, sumptch, sumptchpu));
+          twoDHists_.at ("pvAssociationFactored_TrackJets/jetBetaVsGenBeta")->Fill (beta_dz (*tmpJet, tracks, vertices, 0.2, sumptch, sumptchpv, maxGenSumPt2Index), beta_dz (*tmpJet, tracks, vertices, 0.2, sumptch, sumptchpv));
           //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
     }
@@ -1838,7 +1856,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored_TrackJets/fakeJetEta")->Fill (fabs (jet.eta ()));
-      jetBeta = beta (jet, tracks, vertices, sumptch, sumptchpv);
+      jetBeta = beta_dz (jet, tracks, vertices, 0.2, sumptch, sumptchpv);
 
       if (jetBeta < 0.1)
         continue;
@@ -1938,21 +1956,13 @@ VFPixAnalyzer::isMatched (const reco::Track &track, const edm::Handle<vector<Sim
   return false;
 }
 
-double
-VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::beta (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
 {
   sumptchpv = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -1962,15 +1972,7 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
     {
       for (auto track = vertices->at (vertexIndex).tracks_begin (); track != vertices->at (vertexIndex).tracks_end (); track++)
         {
-          if ((*track)->pt () < 0.7)
-            continue;
-          if ((*track)->normalizedChi2 () > 20.0)
-            continue;
-          if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
-            continue;
-          if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
-            continue;
-          if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
+          if (!isGoodTrack (**track))
             continue;
           if (deltaR (**track, jet) > 0.4)
             continue;
@@ -1981,21 +1983,13 @@ VFPixAnalyzer::beta (const reco::PFJet &jet, const edm::Handle<vector<reco::Trac
   return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::betaStar (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
 {
   sumptchpu = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2022,21 +2016,13 @@ VFPixAnalyzer::betaStar (const reco::PFJet &jet, const edm::Handle<vector<reco::
   return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::beta_dz (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzCut, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::beta_dz (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzCut, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
 {
   sumptchpv = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2052,21 +2038,13 @@ VFPixAnalyzer::beta_dz (const reco::PFJet &jet, const edm::Handle<vector<reco::T
   return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::betaStar_dz (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzCut, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::betaStar_dz (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzCut, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
 {
   sumptchpu = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2092,21 +2070,13 @@ VFPixAnalyzer::betaStar_dz (const reco::PFJet &jet, const edm::Handle<vector<rec
   return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::beta_dzSig (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzSigCut, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::beta_dzSig (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzSigCut, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
 {
   sumptchpv = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2122,21 +2092,13 @@ VFPixAnalyzer::beta_dzSig (const reco::PFJet &jet, const edm::Handle<vector<reco
   return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::betaStar_dzSig (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzSigCut, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
+template<class T> double
+VFPixAnalyzer::betaStar_dzSig (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, const double dzSigCut, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
 {
   sumptchpu = sumptch = 0.0;
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2162,129 +2124,12 @@ VFPixAnalyzer::betaStar_dzSig (const reco::PFJet &jet, const edm::Handle<vector<
   return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
 }
 
-double
-VFPixAnalyzer::beta (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpv, unsigned vertexIndex) const
-{
-  sumptchpv = sumptch = 0.0;
-  for (const auto &track : *tracks)
-    {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
-        continue;
-      if (deltaR (track, jet) > 0.4)
-        continue;
-      sumptch += track.pt ();
-    }
-  if (vertices->size () > 0)
-    {
-      for (auto track = vertices->at (vertexIndex).tracks_begin (); track != vertices->at (vertexIndex).tracks_end (); track++)
-        {
-          if ((*track)->pt () < 0.7)
-            continue;
-          if ((*track)->normalizedChi2 () > 20.0)
-            continue;
-          if ((*track)->hitPattern ().pixelLayersWithMeasurement () < 2)
-            continue;
-          if ((*track)->hitPattern ().trackerLayersWithMeasurement () < 5)
-            continue;
-          if (fabs ((*track)->d0 () / (*track)->d0Error ()) > 5.0)
-            continue;
-          if (deltaR (**track, jet) > 0.4)
-            continue;
-          sumptchpv += (*track)->pt ();
-        }
-    }
-
-  return (sumptch > 0.0 ? (sumptchpv / sumptch) : -999.0);
-}
-
-double
-VFPixAnalyzer::betaStar (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const edm::Handle<vector<reco::Vertex> > &vertices, double &sumptch, double &sumptchpu, unsigned vertexIndex) const
-{
-  sumptchpu = sumptch = 0.0;
-  for (const auto &track : *tracks)
-    {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
-        continue;
-      if (deltaR (track, jet) > 0.4)
-        continue;
-      sumptch += track.pt ();
-
-      if (vertices->size () > 0)
-        {
-          unsigned iVertex = 0;
-          bool fromOtherVertex = false;
-          for (const auto vertex : *vertices)
-            {
-              if ((iVertex++) == vertexIndex)
-                continue;
-              for (auto puTrack = vertex.tracks_begin (); !fromOtherVertex && puTrack != vertex.tracks_end (); puTrack++)
-                fromOtherVertex = (deltaR (track, **puTrack) < 1.0e-12);
-              if (fromOtherVertex)
-                break;
-            }
-          if (fromOtherVertex)
-            sumptchpu += track.pt ();
-        }
-    }
-
-  return (sumptch > 0.0 ? (sumptchpu / sumptch) : -999.0);
-}
-
-void
-VFPixAnalyzer::fillTrackHistograms (const reco::PFJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const reco::Vertex &pv) const
+template<class T> void
+VFPixAnalyzer::fillTrackHistograms (const T &jet, const edm::Handle<vector<reco::Track> > &tracks, const reco::Vertex &pv) const
 {
   for (const auto &track : *tracks)
     {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
-        continue;
-      if (deltaR (track, jet) > 0.4)
-        continue;
-
-      oneDHists_.at ("pvAssociationFactored/jetTrackDz")->Fill (track.dz (pv.position ()), track.pt ());
-      oneDHists_.at ("pvAssociationFactored/jetTrackDxy")->Fill (track.dxy (pv.position ()), track.pt ());
-      oneDHists_.at ("pvAssociationFactored/jetTrackDzSig")->Fill (track.dz (pv.position ()) / hypot (track.dzError (), pv.zError ()), track.pt ());
-      oneDHists_.at ("pvAssociationFactored/jetTrackDxySig")->Fill (track.dxy (pv.position ()) / hypot (track.dxyError (), hypot (pv.xError (), pv.yError ())), track.pt ());
-    }
-}
-
-void
-VFPixAnalyzer::fillTrackHistograms (const reco::TrackJet &jet, const edm::Handle<vector<reco::Track> > &tracks, const reco::Vertex &pv) const
-{
-  for (const auto &track : *tracks)
-    {
-      if (track.pt () < 0.7)
-        continue;
-      if (track.normalizedChi2 () > 20.0)
-        continue;
-      if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
-        continue;
-      if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
-        continue;
-      if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+      if (!isGoodTrack (track))
         continue;
       if (deltaR (track, jet) > 0.4)
         continue;
@@ -2313,6 +2158,51 @@ VFPixAnalyzer::genSumPt2 (const vector<reco::GenParticle> &genParticles) const
     }
 
   return sumPt2;
+}
+
+bool
+VFPixAnalyzer::isGoodTrack (const reco::Track &track, const bool checkPt) const
+{
+  if (checkPt && track.pt () < 0.7)
+    return false;
+  if (track.normalizedChi2 () > 20.0)
+    return false;
+  if (track.hitPattern ().pixelLayersWithMeasurement () < 2)
+    return false;
+  if (track.hitPattern ().trackerLayersWithMeasurement () < 5)
+    return false;
+  if (fabs (track.d0 () / track.d0Error ()) > 5.0)
+    return false;
+  return true;
+}
+
+bool
+VFPixAnalyzer::isMatchedToTrack (const reco::GenParticle &genParticle, const vector<reco::Track> &tracks, const double maxDeltaR) const
+{
+  for (const auto &track : tracks)
+    {
+      if (!isGoodTrack (track))
+        continue;
+      if (deltaR (genParticle, track) > maxDeltaR)
+        continue;
+      return true;
+    }
+  return false;
+}
+
+bool
+VFPixAnalyzer::isMatchedToPFChargedHadron (const reco::GenParticle &genParticle, const vector<reco::PFCandidate> &pfCandidates, const double maxDeltaR, bool &isHF) const
+{
+  for (const auto &pfCandidate : pfCandidates)
+    {
+      reco::PFCandidate::ParticleType particleType (pfCandidate.particleId ());
+      if (particleType != reco::PFCandidate::ParticleType::h && (isHF = !(particleType != reco::PFCandidate::ParticleType::h_HF)))
+        continue;
+      if (deltaR (genParticle, pfCandidate) > maxDeltaR)
+        continue;
+      return true;
+    }
+  return false;
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"

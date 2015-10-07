@@ -12,16 +12,20 @@ files = []
 outputFile = ""
 if scenario == "noTrkExt":
   files = fileNames.noTrkExt
-  outputFile = "vbfHToTauTau_withJEC_noTrkExt"
+  outputFile = "vbfHToTauTau_noTrkExt"
   print "using the scenario without the tracker extension..."
 if scenario == "trkExt":
   files = fileNames.trkExt
-  outputFile = "vbfHToTauTau_withJEC_trkExt"
+  outputFile = "vbfHToTauTau_trkExt"
   print "using the scenario with the tracker extension..."
 if scenario == "trkExt_HToMuMu":
   files = fileNames.trkExt_HToMuMu
-  outputFile = "vbfHToMuMu_withJEC_trkExt"
+  outputFile = "vbfHToMuMu_trkExt"
   print "using the HToMuMu scenario with the tracker extension..."
+if scenario == "trkExt_6_2_0_SLHC26_patch2":
+  files = fileNames.trkExt_6_2_0_SLHC26_patch2
+  outputFile = "vbfHToTauTau_trkExt_6_2_0_SLHC26_patch2"
+  print "using the HToTauTau relval with the tracker extension..."
 
 filesPerJob = int (math.ceil (len (files) / float (nJobs)))
 files = files[(jobNumber * filesPerJob):((jobNumber + 1) * filesPerJob)]
@@ -138,6 +142,7 @@ process.VFPixAnalyzer = cms.EDAnalyzer ('VFPixAnalyzer',
   tracks = cms.InputTag ("generalTracks", ""),
   genParticles = cms.InputTag ("genParticles", ""),
   simTracks = cms.InputTag ("g4SimHits", ""),
+  pfCandidates = cms.InputTag ("particleFlow", ""),
 )
 
 process.VFPixAnalyzerWithSortedPVs = cms.EDAnalyzer ('VFPixAnalyzer',
@@ -149,6 +154,7 @@ process.VFPixAnalyzerWithSortedPVs = cms.EDAnalyzer ('VFPixAnalyzer',
   tracks = cms.InputTag ("generalTracks", ""),
   genParticles = cms.InputTag ("genParticles", ""),
   simTracks = cms.InputTag ("g4SimHits", ""),
+  pfCandidates = cms.InputTag ("particleFlow", ""),
 )
 
 process.delphesVertices = cms.EDProducer ('DelphesVertexProducer',
@@ -170,6 +176,8 @@ process.VFPixAnalyzerWithDelphesVertices = cms.EDAnalyzer ('VFPixAnalyzer',
   tracks = cms.InputTag ("generalTracks", ""),
   genParticles = cms.InputTag ("genParticles", ""),
   simTracks = cms.InputTag ("g4SimHits", ""),
+  pfCandidates = cms.InputTag ("particleFlow", ""),
 )
 
-process.myPath = cms.Path (process.betterOfflinePrimaryVertices*process.ak4PFCHSJetsL1FastL2L3*process.ak4PFJetsL1FastL2L3*process.VFPixAnalyzer*process.VFPixAnalyzerWithSortedPVs*process.delphesVertices*process.VFPixAnalyzerWithDelphesVertices)
+#process.myPath = cms.Path (process.betterOfflinePrimaryVertices*process.ak4PFCHSJetsL1FastL2L3*process.ak4PFJetsL1FastL2L3*process.VFPixAnalyzer*process.VFPixAnalyzerWithSortedPVs*process.delphesVertices*process.VFPixAnalyzerWithDelphesVertices)
+process.myPath = cms.Path (process.ak4PFCHSJetsL1FastL2L3*process.ak4PFJetsL1FastL2L3*process.VFPixAnalyzer)
