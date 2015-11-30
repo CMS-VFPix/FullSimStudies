@@ -27,6 +27,35 @@ if scenario == "trkExt_6_2_0_SLHC26_patch2":
   outputFile = "vbfHToTauTau_trkExt_6_2_0_SLHC26_patch2"
   print "using the HToTauTau relval with the tracker extension..."
 
+if scenario == "ttbar_40x52":
+  files = fileNames.ttbar_40x52
+  outputFile = "ttbar_40x52"
+  print "using the ttbar relval with the 40x52 FPIX..."
+if scenario == "ttbar_53x52":
+  files = fileNames.ttbar_53x52
+  outputFile = "ttbar_53x52"
+  print "using the ttbar relval with the 53x52 FPIX..."
+if scenario == "ttbar_73x52":
+  files = fileNames.ttbar_73x52
+  outputFile = "ttbar_73x52"
+  print "using the ttbar relval with the 73x52 FPIX..."
+if scenario == "ttbar_80x26":
+  files = fileNames.ttbar_80x26
+  outputFile = "ttbar_80x26"
+  print "using the ttbar relval with the 80x26 FPIX..."
+if scenario == "ttbar_80x35":
+  files = fileNames.ttbar_80x35
+  outputFile = "ttbar_80x35"
+  print "using the ttbar relval with the 80x35 FPIX..."
+if scenario == "ttbar_80x47":
+  files = fileNames.ttbar_80x47
+  outputFile = "ttbar_80x47"
+  print "using the ttbar relval with the 80x47 FPIX..."
+if scenario == "ttbar_80x52":
+  files = fileNames.ttbar_80x52
+  outputFile = "ttbar_80x52"
+  print "using the ttbar relval with the 80x52 FPIX..."
+
 filesPerJob = int (math.ceil (len (files) / float (nJobs)))
 files = files[(jobNumber * filesPerJob):((jobNumber + 1) * filesPerJob)]
 print "job " + str (jobNumber) + "/" + str (nJobs) + " will process " + str (len (files)) + " files..."
@@ -40,7 +69,7 @@ process.load ('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.TFileService = cms.Service ('TFileService',
-  fileName = cms.string (outputFile + str (jobNumber) + ".root")
+  fileName = cms.string (outputFile + "_" + str (jobNumber) + ".root")
 )
 process.maxEvents = cms.untracked.PSet (
   input = cms.untracked.int32 (-1)
@@ -56,8 +85,8 @@ process.load ("Configuration.StandardSequences.MagneticField_cff")
 process.load ('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'DES23_62_V1::All'
 
-from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import *
-process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(jets = "ak5CaloJets")
+#from CommonTools.RecoAlgos.sortedPrimaryVertices_cfi import *
+#process.betterOfflinePrimaryVertices=sortedPrimaryVertices.clone(jets = "ak5CaloJets")
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *

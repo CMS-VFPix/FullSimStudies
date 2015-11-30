@@ -103,14 +103,14 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   //oneDHists_["bpixHitsVsTrackEta"] = trackDir.make<TH1D> ("bpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
   //oneDHists_["fpixHitsVsTrackEta"] = trackDir.make<TH1D> ("fpixHitsVsTrackEta", ";track #eta", 1000, -5.0, 5.0);
-  //oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
+  oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   oneDHists_["chargedHadronEta"] = trackDir.make<TH1D> ("chargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pfChargedHadronEta"] = trackDir.make<TH1D> ("pfChargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pfChargedHadronHFEta"] = trackDir.make<TH1D> ("pfChargedHadronHFEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
   oneDHists_["chargedHadronTrackEta"] = trackDir.make<TH1D> ("chargedHadronTrackEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
 
-  /*twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
+  twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
   twoDHists_["ptErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("ptErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{p_{T}} / p_{T} [%]", 1000, 0.0, 5.0, ptErrorBins.size () - 1, ptErrorBins.data ());
   twoDHists_["d0ErrorVsTrackEta_0p7"] = trackDir.make<TH2D> ("d0ErrorVsTrackEta_0p7", ";track |#eta|;track #sigma_{d_{0}} [cm]", 1000, 0.0, 5.0, d0ErrorBins.size () - 1, d0ErrorBins.data ());
@@ -130,7 +130,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   twoDHists_["bpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixXErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
   twoDHists_["bpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("bpixYErrorVsTrackEta", ";track |#eta|;BPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
   twoDHists_["fpixXErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixXErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{x} [cm]", 1000, 0.0, 5.0, xErrorBins.size () - 1, xErrorBins.data ());
-  twoDHists_["fpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());*/
+  twoDHists_["fpixYErrorVsTrackEta"] = trackDir.make<TH2D> ("fpixYErrorVsTrackEta", ";track |#eta|;FPIX hit #sigma_{y} [cm]", 1000, 0.0, 5.0, yErrorBins.size () - 1, yErrorBins.data ());
 
   /*threeDHists_["trackPtError"] = trackDir.make<TH3D> ("trackPtError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltap_{T}/p_{T}) [%]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
   threeDHists_["trackD0Error"] = trackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
@@ -301,7 +301,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   threeDHists_["fakeTracks/trackD0Error"] = fakeTrackDir.make<TH3D> ("trackD0Error", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{0}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());
   threeDHists_["fakeTracks/trackDzError"] = fakeTrackDir.make<TH3D> ("trackDzError", ";track |#eta|;track p_{} [GeV];track #sigma(#deltad_{z}) [cm]", trackEtaBins.size () - 1, trackEtaBins.data (), trackErrorPtBins.size () - 1, trackErrorPtBins.data (), trackErrorBins.size () - 1, trackErrorBins.data ());*/
 
-  oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  /*oneDHists_["pvAssociationFactored/vbfQuarkEta"] = pvAssociationFactoredDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/nVertices"] = pvAssociationFactoredDir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored/vbfJetsFound_nVertices"] = pvAssociationFactoredDir.make<TH1D> ("vbfJetsFound_nVertices", ";number of vertices", 200, 0.0, 200.0);
@@ -361,7 +361,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationNoCHS/fakeJetBetaStar"] = pvAssociationNoCHSDir.make<TH1D> ("fakeJetBetaStar", ";fake jet #beta*", 100, 0.0, 1.01);
   oneDHists_["pvAssociationNoCHS/fakeJetSumPtCh"] = pvAssociationNoCHSDir.make<TH1D> ("fakeJetSumPtCh", ";fake jet #sump_{T} [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
   oneDHists_["pvAssociationNoCHS/fakeJetSumPtChPV"] = pvAssociationNoCHSDir.make<TH1D> ("fakeJetSumPtChPV", ";fake jet #sump_{T} from PV [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
-  oneDHists_["pvAssociationNoCHS/fakeJetSumPtChPU"] = pvAssociationNoCHSDir.make<TH1D> ("fakeJetSumPtChPU", ";fake jet #sump_{T} from PU [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());
+  oneDHists_["pvAssociationNoCHS/fakeJetSumPtChPU"] = pvAssociationNoCHSDir.make<TH1D> ("fakeJetSumPtChPU", ";fake jet #sump_{T} from PU [GeV]", sumPtChBins.size () - 1, sumPtChBins.data ());*/
 
   /*oneDHists_["pvAssociationFactored15/vbfQuarkEta"] = pvAssociationFactored15Dir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored15/nVertices"] = pvAssociationFactored15Dir.make<TH1D> ("nVertices", ";number of vertices", 200, 0.0, 200.0);
@@ -393,7 +393,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   twoDHists_["pvAssociationFactored20/jetBetaVsGenBeta"] = pvAssociationFactored20Dir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 0.1);*/
 
-  oneDHists_["pvAssociationFactored_BetaStar/vbfQuarkEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
+  /*oneDHists_["pvAssociationFactored_BetaStar/vbfQuarkEta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfQuarkEta", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_BetaStar/vbfJetsFound"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("vbfJetsFound", ";VBF quark |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_BetaStar/jetBeta"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetBeta", ";VBF jet #beta", 100, 0.0, 1.01);
   oneDHists_["pvAssociationFactored_BetaStar/jetBetaStar"] = pvAssociationFactored_BetaStarDir.make<TH1D> ("jetBetaStar", ";VBF jet #beta*", 100, 0.0, 1.01);
@@ -438,7 +438,7 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["pvAssociationFactored_TrackJets/fakeJetEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("fakeJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pvAssociationFactored_TrackJets/goodJetEta"] = pvAssociationFactored_TrackJetsDir.make<TH1D> ("goodJetEta", ";jet |#eta|", 1000, 0.0, 5.0);
 
-  twoDHists_["pvAssociationFactored_TrackJets/jetBetaVsGenBeta"] = pvAssociationFactored_TrackJetsDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 1.01);
+  twoDHists_["pvAssociationFactored_TrackJets/jetBetaVsGenBeta"] = pvAssociationFactored_TrackJetsDir.make<TH2D> ("jetBetaVsGenBeta", ";VBF jet gen #beta;VBF jet #beta", 100, 0.0, 1.01, 100, 0.0, 1.01);*/
 }
 
 VFPixAnalyzer::~VFPixAnalyzer ()
@@ -467,7 +467,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   edm::Handle<vector<reco::PFCandidate> > pfCandidates;
   event.getByLabel (pfCandidates_, pfCandidates);
 
-  double sumptch, sumptchpv, sumptchpu;
+  //double sumptch, sumptchpv, sumptchpu;
   double nPU_bx0 = 0.0;
   for (const auto &pu : *pus)
     {
@@ -599,12 +599,12 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
     }
 
-  /*unsigned nTracks = 0; //, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
+  unsigned nTracks = 0; //, nElectrons = 0, nMuons = 0, nChargedHadrons = 0, nFakeTracks = 0;
   for (const auto &track : *tracks)
     {
       double vz = track.vz (),
              pt = track.pt (),
-             d0 = track.d0 (),
+             //d0 = track.d0 (),
              //dz = track.dz (),
              eta = track.eta (),
              ptError = track.ptError (),
@@ -646,7 +646,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("ptErrorVsTrackEta_100p0")->Fill (fabs (eta), (ptError / pt) * 100.0);
           twoDHists_.at ("d0ErrorVsTrackEta_100p0")->Fill (fabs (eta), d0Error);
           twoDHists_.at ("dzErrorVsTrackEta_100p0")->Fill (fabs (eta), dzError);
-        }*/
+        }
 
       /*threeDHists_.at ("trackPtError")->Fill (eta, pt, (ptError / pt) * 100.0);
       threeDHists_.at ("trackD0Error")->Fill (eta, pt, d0Error);
@@ -913,9 +913,9 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
               twoDHists_.at ("fpixYErrorVsTrackEta")->Fill (fabs (eta), yError);
             }
         }*/
-    //}
-  /*oneDHists_.at ("nTracks")->Fill (nTracks);
-  oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
+    }
+  oneDHists_.at ("nTracks")->Fill (nTracks);
+  /*oneDHists_.at ("electrons/nTracks")->Fill (nElectrons);
   oneDHists_.at ("muons/nTracks")->Fill (nMuons);
   oneDHists_.at ("chargedHadrons/nTracks")->Fill (nChargedHadrons);
   oneDHists_.at ("fakeTracks/nTracks")->Fill (nFakeTracks);*/
@@ -923,7 +923,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 ////////////////////////////////////////////////////////////////////////////////
 // Find the VBF quarks in the genParticles list.
 ////////////////////////////////////////////////////////////////////////////////
-  vector<reco::GenParticle> quarks;
+/*  vector<reco::GenParticle> quarks;
   for (const auto &particle : *genParticles)
     {
       unsigned status = particle.status ();
@@ -1019,7 +1019,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("pvAssociationFactored/jetBetaVsGenBeta")->Fill (beta (*tmpJet, tracks, vertices, sumptch, sumptchpv, maxGenSumPt2Index), beta (*tmpJet, tracks, vertices, sumptch, sumptchpv));
           //fillTrackHistograms (*tmpJet, tracks, vertices->at (0));
         }
-    }
+    }*/
   /*if (noMatchedVBFQuarks)
     cout << event.id().run() << ":" << event.id().luminosityBlock() << ":" << event.id().event() << endl;*/
 
@@ -1139,7 +1139,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 ////////////////////////////////////////////////////////////////////////////////
 // Calculation of PV association fake rate.
 ////////////////////////////////////////////////////////////////////////////////
-  for (const auto &jet : *jets)
+  /*for (const auto &jet : *jets)
     {
       double dR, jetBeta, jetBetaStar;
 
@@ -1180,7 +1180,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         continue;
 
       oneDHists_.at ("pvAssociationFactored/goodJetEta")->Fill (fabs (jet.eta ()));
-    }
+    }*/
 
   /*for (const auto &jet : *jets)
     {
@@ -1259,7 +1259,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 // Calculation of PV association efficiency using dz to associate tracks to
 // vertices.
 ////////////////////////////////////////////////////////////////////////////////
-  for (const auto &quark : quarks)
+/*  for (const auto &quark : quarks)
     {
       if (quark.pt () < 30.0)
         continue;
@@ -1877,7 +1877,7 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 
       oneDHists_.at ("jetPt")->Fill (pt);
       oneDHists_.at ("jetEta")->Fill (eta);
-    }
+    }*/
 }
 
 void
