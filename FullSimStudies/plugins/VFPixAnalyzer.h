@@ -67,7 +67,8 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     template<class T> void fillTrackHistograms (const T &, const edm::Handle<vector<reco::Track> > &, const reco::Vertex &) const;
     double genSumPt2 (const vector<reco::GenParticle> &) const;
     bool isGoodTrack (const reco::Track &, const bool = true) const;
-    bool isMatchedToTrack (const reco::GenParticle &, const vector<reco::Track> &, const double) const;
+    bool isMatchedToTrack (const reco::GenParticle &, const vector<reco::Track> &, const double, unordered_set<int> &) const;
+    bool isMatchedToParticle (const reco::Track &, const vector<reco::GenParticle> &, const double, unordered_set<int> &) const;
     bool isMatchedToPFChargedHadron (const reco::GenParticle &, const vector<reco::PFCandidate> &, const double, bool &) const;
 };
 

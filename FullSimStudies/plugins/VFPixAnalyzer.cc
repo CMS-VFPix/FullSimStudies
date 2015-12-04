@@ -106,9 +106,32 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
   oneDHists_["nTracks"] = trackDir.make<TH1D> ("nTracks", ";number of tracks", 1000000, 0.0, 1000000.0);
 
   oneDHists_["chargedHadronEta"] = trackDir.make<TH1D> ("chargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronEta_0p7"] = trackDir.make<TH1D> ("chargedHadronEta_0p7", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronEta_1p0"] = trackDir.make<TH1D> ("chargedHadronEta_1p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronEta_10p0"] = trackDir.make<TH1D> ("chargedHadronEta_10p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronEta_50p0"] = trackDir.make<TH1D> ("chargedHadronEta_50p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronEta_100p0"] = trackDir.make<TH1D> ("chargedHadronEta_100p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pfChargedHadronEta"] = trackDir.make<TH1D> ("pfChargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
   oneDHists_["pfChargedHadronHFEta"] = trackDir.make<TH1D> ("pfChargedHadronHFEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta_0p7"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta_0p7", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta_1p0"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta_1p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta_10p0"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta_10p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta_50p0"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta_50p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronTrackEta_100p0"] = trackDir.make<TH1D> ("matchedChargedHadronTrackEta_100p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+
   oneDHists_["chargedHadronTrackEta"] = trackDir.make<TH1D> ("chargedHadronTrackEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta_0p7"] = trackDir.make<TH1D> ("chargedHadronTrackEta_0p7", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta_1p0"] = trackDir.make<TH1D> ("chargedHadronTrackEta_1p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta_10p0"] = trackDir.make<TH1D> ("chargedHadronTrackEta_10p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta_50p0"] = trackDir.make<TH1D> ("chargedHadronTrackEta_50p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["chargedHadronTrackEta_100p0"] = trackDir.make<TH1D> ("chargedHadronTrackEta_100p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta"] = trackDir.make<TH1D> ("matchedChargedHadronEta", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta_0p7"] = trackDir.make<TH1D> ("matchedChargedHadronEta_0p7", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta_1p0"] = trackDir.make<TH1D> ("matchedChargedHadronEta_1p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta_10p0"] = trackDir.make<TH1D> ("matchedChargedHadronEta_10p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta_50p0"] = trackDir.make<TH1D> ("matchedChargedHadronEta_50p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
+  oneDHists_["matchedChargedHadronEta_100p0"] = trackDir.make<TH1D> ("matchedChargedHadronEta_100p0", ";charged hadron |#eta|", 1000, 0.0, 5.0);
 
   twoDHists_["trackEtaVsTrackPt"] = trackDir.make<TH2D> ("trackEtaVsTrackPt", ";track p_{T} [GeV];track #eta", fineTrackPtBins.size () - 1, fineTrackPtBins.data (), 1000, -5.0, 5.0);
   twoDHists_["trackPtVsTrackZ"] = trackDir.make<TH2D> ("trackPtVsTrackZ", ";track z [cm];track p_{T} [GeV]", 1000, -15.0, 15.0, trackPtBins.size () - 1, trackPtBins.data ());
@@ -575,27 +598,86 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
   oneDHists_.at ("genPVIndex")->Fill (maxGenSumPt2Index);
   twoDHists_.at ("nVerticesVsNPU")->Fill (nPU_bx0, nVertices);
 
+  unordered_set<int> used;
+  used.clear ();
   for (const auto &genParticle : *genParticles)
     {
+      double pt = genParticle.pt (), eta = genParticle.eta ();
       if (genParticle.status () != 1)
         continue;
       if (!genParticle.charge ())
         continue;
-      if (genParticle.pt () < 0.7)
+      if (pt < 0.7)
         continue;
       if (abs (genParticle.pdgId ()) == 11 || abs (genParticle.pdgId ()) == 13 || abs (genParticle.pdgId ()) == 15)
         continue;
-      oneDHists_.at ("chargedHadronEta")->Fill (fabs (genParticle.eta ()));
+      oneDHists_.at ("chargedHadronEta")->Fill (fabs (eta));
+      if (fabs (pt - 0.7) / 0.7 < 0.1)
+        oneDHists_.at ("chargedHadronEta_0p7")->Fill (fabs (eta));
+      if (fabs (pt - 1.0) / 1.0 < 0.1)
+        oneDHists_.at ("chargedHadronEta_1p0")->Fill (fabs (eta));
+      if (fabs (pt - 10.0) / 10.0 < 0.1)
+        oneDHists_.at ("chargedHadronEta_10p0")->Fill (fabs (eta));
+      if (fabs (pt - 50.0) / 50.0 < 0.1)
+        oneDHists_.at ("chargedHadronEta_50p0")->Fill (fabs (eta));
+      if (fabs (pt - 100.0) / 100.0 < 0.1)
+        oneDHists_.at ("chargedHadronEta_100p0")->Fill (fabs (eta));
 
-      bool isHF = false;
-      if (isMatchedToTrack (genParticle, *tracks, 0.01))
-        oneDHists_.at ("chargedHadronTrackEta")->Fill (fabs (genParticle.eta ()));
-      if (isMatchedToPFChargedHadron (genParticle, *pfCandidates, 0.01, isHF))
+      bool /*isHF = false,*/ isMatched = isMatchedToTrack (genParticle, *tracks, 0.01, used);
+      if (isMatched)
+        {
+          oneDHists_.at ("matchedChargedHadronTrackEta")->Fill (fabs (eta));
+          if (fabs (pt - 0.7) / 0.7 < 0.1)
+            oneDHists_.at ("matchedChargedHadronTrackEta_0p7")->Fill (fabs (eta));
+          if (fabs (pt - 1.0) / 1.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronTrackEta_1p0")->Fill (fabs (eta));
+          if (fabs (pt - 10.0) / 10.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronTrackEta_10p0")->Fill (fabs (eta));
+          if (fabs (pt - 50.0) / 50.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronTrackEta_50p0")->Fill (fabs (eta));
+          if (fabs (pt - 100.0) / 100.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronTrackEta_100p0")->Fill (fabs (eta));
+        }
+      /*if (isMatchedToPFChargedHadron (genParticle, *pfCandidates, 0.01, isHF))
         {
           if (isHF)
             oneDHists_.at ("pfChargedHadronHFEta")->Fill (fabs (genParticle.eta ()));
           else
             oneDHists_.at ("pfChargedHadronEta")->Fill (fabs (genParticle.eta ()));
+        }*/
+    }
+  used.clear ();
+  for (const auto &track : *tracks)
+    {
+      double pt = track.pt (), eta = track.eta ();
+      if (!isGoodTrack (track, false))
+        continue;
+      oneDHists_.at ("chargedHadronTrackEta")->Fill (fabs (eta));
+      if (fabs (pt - 0.7) / 0.7 < 0.1)
+        oneDHists_.at ("chargedHadronTrackEta_0p7")->Fill (fabs (eta));
+      if (fabs (pt - 1.0) / 1.0 < 0.1)
+        oneDHists_.at ("chargedHadronTrackEta_1p0")->Fill (fabs (eta));
+      if (fabs (pt - 10.0) / 10.0 < 0.1)
+        oneDHists_.at ("chargedHadronTrackEta_10p0")->Fill (fabs (eta));
+      if (fabs (pt - 50.0) / 50.0 < 0.1)
+        oneDHists_.at ("chargedHadronTrackEta_50p0")->Fill (fabs (eta));
+      if (fabs (pt - 100.0) / 100.0 < 0.1)
+        oneDHists_.at ("chargedHadronTrackEta_100p0")->Fill (fabs (eta));
+
+      bool isMatched = isMatchedToParticle (track, *genParticles, 0.01, used);
+      if (isMatched)
+        {
+          oneDHists_.at ("matchedChargedHadronEta")->Fill (fabs (eta));
+          if (fabs (pt - 0.7) / 0.7 < 0.1)
+            oneDHists_.at ("matchedChargedHadronEta_0p7")->Fill (fabs (eta));
+          if (fabs (pt - 1.0) / 1.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronEta_1p0")->Fill (fabs (eta));
+          if (fabs (pt - 10.0) / 10.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronEta_10p0")->Fill (fabs (eta));
+          if (fabs (pt - 50.0) / 50.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronEta_50p0")->Fill (fabs (eta));
+          if (fabs (pt - 100.0) / 100.0 < 0.1)
+            oneDHists_.at ("matchedChargedHadronEta_100p0")->Fill (fabs (eta));
         }
     }
 
@@ -2177,14 +2259,58 @@ VFPixAnalyzer::isGoodTrack (const reco::Track &track, const bool checkPt) const
 }
 
 bool
-VFPixAnalyzer::isMatchedToTrack (const reco::GenParticle &genParticle, const vector<reco::Track> &tracks, const double maxDeltaR) const
+VFPixAnalyzer::isMatchedToTrack (const reco::GenParticle &genParticle, const vector<reco::Track> &tracks, const double maxDeltaR, unordered_set<int> &usedTracks) const
 {
-  for (const auto &track : tracks)
+  double minDeltaR = -1.0;
+  int minDeltaRIndex = -1, i = 0;
+  for (auto track = tracks.cbegin (); track != tracks.cend (); track++, i++)
     {
-      if (!isGoodTrack (track))
+      if (!isGoodTrack (*track))
         continue;
-      if (deltaR (genParticle, track) > maxDeltaR)
+      if (usedTracks.count (i))
         continue;
+
+      double dR = deltaR (genParticle, *track);
+      if (dR < minDeltaR || minDeltaR < 0.0)
+        {
+          minDeltaR = dR;
+          minDeltaRIndex = i;
+        }
+    }
+  if (minDeltaR >= 0.0 && minDeltaR < maxDeltaR)
+    {
+      usedTracks.insert (minDeltaRIndex);
+      return true;
+    }
+  return false;
+}
+
+bool
+VFPixAnalyzer::isMatchedToParticle (const reco::Track &track, const vector<reco::GenParticle> &particles, const double maxDeltaR, unordered_set<int> &usedParticles) const
+{
+  double minDeltaR = -1.0;
+  int minDeltaRIndex = -1, i = 0;
+  for (auto particle = particles.cbegin (); particle != particles.cend (); particle++, i++)
+    {
+      if (particle->status () != 1)
+        continue;
+      if (!particle->charge ())
+        continue;
+      if (particle->pt () < 0.7)
+        continue;
+      if (usedParticles.count (i))
+        continue;
+
+      double dR = deltaR (track, *particle);
+      if (dR < minDeltaR || minDeltaR < 0.0)
+        {
+          minDeltaR = dR;
+          minDeltaRIndex = i;
+        }
+    }
+  if (minDeltaR >= 0.0 && minDeltaR < maxDeltaR)
+    {
+      usedParticles.insert (minDeltaRIndex);
       return true;
     }
   return false;
