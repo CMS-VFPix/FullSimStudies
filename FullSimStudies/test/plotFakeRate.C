@@ -17,6 +17,8 @@
 
 using namespace std;
 
+void invert (TGraphAsymmErrors &);
+
 void
 plot (const string &rowsOrCols, const string &pt)
 {
@@ -43,9 +45,9 @@ plot (const string &rowsOrCols, const string &pt)
   for (vector<string>::const_iterator res = resolutions.begin (); res != resolutions.end (); res++)
     {
       fin = TFile::Open (("ttbar_" + *res + ".root").c_str ());
-      TH1D *den = (TH1D *) fin->Get (("VFPixAnalyzer/tracks/chargedHadronEta_" + pt).c_str ());
+      TH1D *den = (TH1D *) fin->Get (("VFPixAnalyzer/tracks/chargedHadronTrackEta" + (pt == "" ? "" : "_" + pt)).c_str ());
       den->SetDirectory (0);
-      TH1D *num = (TH1D *) fin->Get (("VFPixAnalyzer/tracks/matchedChargedHadronTrackEta_" + pt).c_str ());
+      TH1D *num = (TH1D *) fin->Get (("VFPixAnalyzer/tracks/matchedChargedHadronEta" + (pt == "" ? "" : "_" + pt)).c_str ());
       num->SetDirectory (0);
       fin->Close ();
 
@@ -81,6 +83,8 @@ plot (const string &rowsOrCols, const string &pt)
           hist->SetLineColor (kBlack);
         }
 
+      invert (*hist);
+
       hists[*res] = hist;
     }
 
@@ -114,6 +118,8 @@ plot (const string &rowsOrCols, const string &pt)
     pt3->AddText("p_{T} = 50 GeV");
   else if (pt == "100p0")
     pt3->AddText("p_{T} = 100 GeV");
+  else if (pt == "")
+    pt3->AddText("p_{T} > 0.7 GeV");
 
   TLegend *leg = new TLegend (0.171679,0.643035,0.408521,0.828358,"FPix pixel size","brNDC");
   leg->SetBorderSize(0);
@@ -170,7 +176,7 @@ plot (const string &rowsOrCols, const string &pt)
           //theClone->GetYaxis ()->SetRangeUser (0.0, 1.5);
 
           theClone->GetXaxis ()->SetTitle ("track |#eta|");
-          theClone->GetYaxis ()->SetTitle ("tracking efficiency");
+          theClone->GetYaxis ()->SetTitle ("tracking fake rate");
           theClone->GetYaxis ()->SetRangeUser (0.0, 1.6);
         }
       firstPlot = false;
@@ -179,5 +185,22 @@ plot (const string &rowsOrCols, const string &pt)
   pt2->Clone ()->Draw ("same");
   pt3->Clone ()->Draw ("same");
   leg->Clone ()->Draw ("same");
-  c1->Print (("trackingEfficiency_" + rowsOrCols + "_" + pt + ".pdf").c_str (), "pdf");
+  c1->Print (("trackingFakeRate_" + rowsOrCols + (pt == "" ? "_allPt" : "_" + pt) + ".pdf").c_str (), "pdf");
+}
+
+void
+invert (TGraphAsymmErrors &graph)
+{
+  for (int i = 0; i < graph.GetN (); i++)
+    {
+      double x, y, eyHigh, eyLow;
+
+      graph.GetPoint (i, x, y);
+      eyHigh = graph.GetErrorYhigh (i);
+      eyLow = graph.GetErrorYlow (i);
+
+      graph.SetPoint (i, x, 1.0 - y);
+      graph.SetPointEYhigh (i, eyLow);
+      graph.SetPointEYlow (i, eyHigh);
+    }
 }
