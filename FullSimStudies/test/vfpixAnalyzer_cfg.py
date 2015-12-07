@@ -69,7 +69,7 @@ process.load ('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.TFileService = cms.Service ('TFileService',
-  fileName = cms.string (outputFile + "_" + str (jobNumber) + ".root")
+  fileName = cms.string ("/afs/cern.ch/user/a/ahart/work/public/vfpix/" + outputFile + "_" + str (jobNumber) + ".root")
 )
 process.maxEvents = cms.untracked.PSet (
   input = cms.untracked.int32 (-1)
