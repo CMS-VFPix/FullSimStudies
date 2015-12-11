@@ -86,8 +86,8 @@ process = cust_2023HGCalPandoraMuon(process)
 
 for i in range (0, len (process.XMLIdealGeometryESSource.geomXMLFiles)):
     xmlFile = process.XMLIdealGeometryESSource.geomXMLFiles[i]
-    if not xmlFile.endswith ("trackerStructureTopology_80x5200.xml"):
+    if not xmlFile.endswith ("trackerStructureTopology.xml"):
         continue
-    process.XMLIdealGeometryESSource.geomXMLFiles[i] = "VFPix/MonteCarlo/data/trackerStructureTopology_80x5200.xml"
+    process.XMLIdealGeometryESSource.geomXMLFiles[i] = "VFPix/MonteCarlo/data/trackerStructureTopology_80x520.xml"
 
 # End of customisation functions
