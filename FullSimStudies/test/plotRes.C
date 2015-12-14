@@ -129,11 +129,11 @@ plot (const string &rowsOrCols, const string &pt)
   pt2->SetTextSize(0.0374065);
   pt2->AddText("14 TeV, PU = 140");
 
-  TPaveText *pt3 = new TPaveText(0.64787,0.763682,0.829574,0.833333,"brNDC");
+  TPaveText *pt3 = new TPaveText(0.637845,0.771144,0.819549,0.839552,"brNDC");
   pt3->SetBorderSize(0);
   pt3->SetFillStyle(0);
   pt3->SetTextFont(42);
-  pt3->SetTextSize(0.0349127);
+  pt3->SetTextSize(0.0373134);
   pt3->SetTextAlign(12);
   if (pt == "0p7")
     pt3->AddText("p_{T} = 0.7 GeV");
@@ -146,12 +146,23 @@ plot (const string &rowsOrCols, const string &pt)
   else if (pt == "100p0")
     pt3->AddText("p_{T} = 100 GeV");
 
-  TLegend *leg = new TLegend (0.161654,0.681592,0.348371,0.81592,NULL,"brNDC");
+  TLegend *leg = new TLegend (0.171679,0.643035,0.408521,0.828358,"FPix pixel size","brNDC");
   leg->SetBorderSize(0);
-  leg->SetTextSize(0.0349127);
+  leg->SetTextSize(0.0373134);
+  leg->SetTextAlign(22);
   leg->SetFillStyle(0);
   for (vector<string>::const_iterator res = resolutions.begin (); res != resolutions.end (); res++)
-    leg->AddEntry (hists.at ("pt").at (*res), ("FPix " + *res).c_str (), "p");
+    {
+      int x = res->find ('x');
+      string rows = res->substr (0, x), cols = res->substr (x + 1, res->length () - x - 1);
+      int xSize = 100.0 * (80.0 / atof (rows.c_str ())), ySize = 150.0 * (52.0 / atof (cols.c_str ()));
+
+      stringstream pixelSize;
+      pixelSize.str ("");
+      pixelSize << xSize << "#times" << ySize << " #mum^{2}";
+
+      leg->AddEntry (hists.at ("pt").at (*res), pixelSize.str ().c_str (), "p");
+    }
 
   TCanvas *c1 = new TCanvas("c1", "c1",522,103,800,830);
   gStyle->SetOptStat(0);
