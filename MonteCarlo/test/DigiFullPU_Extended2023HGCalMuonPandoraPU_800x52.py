@@ -5,7 +5,7 @@
 # with command line options: step2 --conditions PH2_1K_FB_V6::All --pileup_input das:/RelValMinBias_TuneZ2star_14TeV/CMSSW_6_2_0_SLHC26_patch4-PH2_1K_FB_V6_HLLHCBS-v1/GEN-SIM -n 10 --eventcontent FEVTDEBUGHLT -s DIGI:pdigi_valid,L1,DIGI2RAW --datatier GEN-SIM-DIGI-RAW --pileup AVE_140_BX_25ns --customise RecoParticleFlow/PandoraTranslator/customizeHGCalPandora_cff.cust_2023HGCalPandoraMuon --geometry Extended2023HGCalMuon,Extended2023HGCalMuonReco --magField 38T_PostLS1 --io DigiFullPU_Extended2023HGCalMuonPandoraPU.io --python DigiFullPU_Extended2023HGCalMuonPandoraPU.py --no_exec --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('DIGI2RAW')
+process = cms.Process('DIGI2RAW4FPIX')
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -28,7 +28,8 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:step1.root')
+    #fileNames = cms.untracked.vstring('file:step1.root')
+    fileNames = cms.untracked.vstring('root://cmsxrootd.fnal.gov//store/user/ahart/VBF_HToZZTo4L_M_125_TuneZ2star_14TeV_pythia6_tauola_FPix800x52/CMSSW_6_2_0_SLHC26_patch4-PH2_1K_FB_V6_HLLHCBS_140-v1/151208_171353/0000/step1_221.root'),
 )
 
 process.options = cms.untracked.PSet(
@@ -62,7 +63,7 @@ process.mix.input.nbPileupEvents.averageNumber = cms.double(140.000000)
 process.mix.bunchspace = cms.int32(25)
 process.mix.minBunch = cms.int32(-12)
 process.mix.maxBunch = cms.int32(3)
-process.mix.input.fileNames = cms.untracked.vstring(['/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/06C1EE58-E178-E511-AA98-0025905A48D6.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0A1749E7-DF78-E511-9540-0025905A60D2.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0A8EE1A3-E178-E511-A0A8-0025905964A2.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0C9EE226-E778-E511-9C8A-0025905B859E.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0EFF697A-E078-E511-8997-0025905A497A.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/8E4A142B-E778-E511-8B72-0025905A6138.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/BCA33BEE-E378-E511-A63A-0025905964B6.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/BE421FA9-E578-E511-A04B-0025905A60B4.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/D4C8C3B5-E378-E511-99AE-0025905A48D6.root', '/store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/E06DB90C-E178-E511-8E11-0025905B8572.root'])
+process.mix.input.fileNames = cms.untracked.vstring(['root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/06C1EE58-E178-E511-AA98-0025905A48D6.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0A1749E7-DF78-E511-9540-0025905A60D2.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0A8EE1A3-E178-E511-A0A8-0025905964A2.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0C9EE226-E778-E511-9C8A-0025905B859E.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/0EFF697A-E078-E511-8997-0025905A497A.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/8E4A142B-E778-E511-8B72-0025905A6138.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/BCA33BEE-E378-E511-A63A-0025905964B6.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/BE421FA9-E578-E511-A04B-0025905A60B4.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/D4C8C3B5-E378-E511-99AE-0025905A48D6.root', 'root://cmsxrootd.fnal.gov///store/relval/CMSSW_6_2_0_SLHC26_patch4/RelValMinBias_TuneZ2star_14TeV/GEN-SIM/PH2_1K_FB_V6_HLLHCBS-v1/00000/E06DB90C-E178-E511-8E11-0025905B8572.root'])
 process.mix.digitizers = cms.PSet(process.theDigitizersValid)
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'PH2_1K_FB_V6::All', '')

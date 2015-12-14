@@ -5,7 +5,7 @@
 # with command line options: step2 --conditions PH2_1K_FB_V6::All --pileup_input das:/RelValMinBias_TuneZ2star_14TeV/CMSSW_6_2_0_SLHC26_patch4-PH2_1K_FB_V6_HLLHCBS-v1/GEN-SIM -n 10 --eventcontent FEVTDEBUGHLT -s DIGI:pdigi_valid,L1,DIGI2RAW --datatier GEN-SIM-DIGI-RAW --pileup AVE_140_BX_25ns --customise RecoParticleFlow/PandoraTranslator/customizeHGCalPandora_cff.cust_2023HGCalPandoraMuon --geometry Extended2023HGCalMuon,Extended2023HGCalMuonReco --magField 38T_PostLS1 --io DigiFullPU_Extended2023HGCalMuonPandoraPU.io --python DigiFullPU_Extended2023HGCalMuonPandoraPU.py --no_exec --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('DIGI2RAW')
+process = cms.Process('DIGI2RAW4FPIX')
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
