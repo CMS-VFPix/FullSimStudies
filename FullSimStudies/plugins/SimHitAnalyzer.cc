@@ -26,6 +26,11 @@ SimHitAnalyzer::SimHitAnalyzer (const edm::ParameterSet &cfg) :
 
   twoDHists_["rhoPhi"] = fs_->make<TH2D> ("rhoPhi", ";x [cm];y [cm]", 500, 0.0, 20.0, 500, 0.0, 20.0);
   twoDHists_["rhoZ"] = fs_->make<TH2D> ("rhoZ", ";z [cm];#rho [cm]", 500, 0.0, 300.0, 500, 0.0, 20.0);
+
+  simHitsBarrelHighTofToken_ = consumes<vector<PSimHit> > (simHitsBarrelHighTof_);
+  simHitsBarrelLowTofToken_ = consumes<vector<PSimHit> > (simHitsBarrelLowTof_);
+  simHitsEndcapHighTofToken_ = consumes<vector<PSimHit> > (simHitsEndcapHighTof_);
+  simHitsEndcapLowTofToken_ = consumes<vector<PSimHit> > (simHitsEndcapLowTof_);
 }
 
 SimHitAnalyzer::~SimHitAnalyzer ()
@@ -36,13 +41,13 @@ void
 SimHitAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 {
   edm::Handle<vector<PSimHit> > simHitsBarrelHighTof;
-  event.getByLabel (simHitsBarrelHighTof_, simHitsBarrelHighTof);
+  event.getByToken (simHitsBarrelHighTofToken_, simHitsBarrelHighTof);
   edm::Handle<vector<PSimHit> > simHitsBarrelLowTof;
-  event.getByLabel (simHitsBarrelLowTof_, simHitsBarrelLowTof);
+  event.getByToken (simHitsBarrelLowTofToken_, simHitsBarrelLowTof);
   edm::Handle<vector<PSimHit> > simHitsEndcapHighTof;
-  event.getByLabel (simHitsEndcapHighTof_, simHitsEndcapHighTof);
+  event.getByToken (simHitsEndcapHighTofToken_, simHitsEndcapHighTof);
   edm::Handle<vector<PSimHit> > simHitsEndcapLowTof;
-  event.getByLabel (simHitsEndcapLowTof_, simHitsEndcapLowTof);
+  event.getByToken (simHitsEndcapLowTofToken_, simHitsEndcapLowTof);
 
   edm::ESHandle<TrackerGeometry> theTrackerGeometry;
   setup.get<TrackerDigiGeometryRecord> ().get (theTrackerGeometry);
