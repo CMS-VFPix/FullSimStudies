@@ -283,11 +283,11 @@ plot (const string &dir, const string &hist, const string& ptRange, const double
 
   size_t startPosition = file[0].find("VBF_HTo4L_FPix") + 14;
 
-  size_t endPosition0 = file[0].find(".root");
-  size_t endPosition1 = file[1].find(".root");
-  size_t endPosition2 = file[2].find(".root");
-  size_t endPosition3 = file[3].find(".root");
-  size_t endPosition4 = file[4].find(".root");
+  size_t endPosition0 = file[0].find(".root")-14;
+  size_t endPosition1 = file[1].find(".root")-14;
+  size_t endPosition2 = file[2].find(".root")-14;
+  size_t endPosition3 = file[3].find(".root")-14;
+  size_t endPosition4 = file[4].find(".root")-14;
 
   TLegend *leg = new TLegend (0.164573,0.695761,0.346734,0.887781,NULL,"brNDC");
   leg->SetBorderSize(0);
