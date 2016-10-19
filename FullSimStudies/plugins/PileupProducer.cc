@@ -35,11 +35,11 @@ PileupProducer::produce (edm::Event &event, const edm::EventSetup &setup)
   edm::Handle<vector<SimTrack> > simTracks;
   event.getByLabel (simTracks_, simTracks);
 
-  auto_ptr<vector<reco::Track> > pileupTracks (new vector<reco::Track> ());
-  auto_ptr<vector<reco::Track> > primaryTracks (new vector<reco::Track> ());
-  auto_ptr<vector<reco::PFCandidate> > pileupNeutrals (new vector<reco::PFCandidate> ());
-  auto_ptr<vector<reco::PFCandidate> > primaryNeutrals (new vector<reco::PFCandidate> ());
-  auto_ptr<vector<reco::GenParticle> > status3 (new vector<reco::GenParticle> ());
+  auto pileupTracks = std::make_unique<vector<reco::Track>>();
+  auto primaryTracks = std::make_unique<vector<reco::Track>>();
+  auto pileupNeutrals = std::make_unique<vector<reco::PFCandidate>>();
+  auto primaryNeutrals = std::make_unique<vector<reco::PFCandidate>>();
+  auto status3 = std::make_unique<vector<reco::GenParticle>>();
 
   for (const auto &track : *tracks)
     {
@@ -63,11 +63,11 @@ PileupProducer::produce (edm::Event &event, const edm::EventSetup &setup)
         break;
       status3->push_back (genParticle);
     }
-  event.put (pileupTracks, "pileupTracks");
-  event.put (primaryTracks, "primaryTracks");
-  event.put (pileupNeutrals, "pileupNeutrals");
-  event.put (primaryNeutrals, "primaryNeutrals");
-  event.put (status3, "status3");
+  event.put (std::move(pileupTracks), "pileupTracks");
+  event.put (std::move(primaryTracks), "primaryTracks");
+  event.put (std::move(pileupNeutrals), "pileupNeutrals");
+  event.put (std::move(primaryNeutrals), "primaryNeutrals");
+  event.put (std::move(status3), "status3");
 }
 
 bool

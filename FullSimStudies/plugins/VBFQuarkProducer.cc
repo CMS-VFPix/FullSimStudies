@@ -33,13 +33,13 @@ VBFQuarkProducer::produce (edm::Event &event, const edm::EventSetup &setup)
   edm::Handle<vector<reco::Vertex> > vertices;
   event.getByLabel (vertices_, vertices);
 
-  auto_ptr<vector<reco::GenParticle> > vbfQuarks (new vector<reco::GenParticle> ());
-  auto_ptr<vector<reco::PFJet> > vbfJets (new vector<reco::PFJet> ());
-  auto_ptr<vector<reco::Track> > vbfJetsTracks (new vector<reco::Track> ());
-  auto_ptr<vector<reco::PFJet> > pileupJets (new vector<reco::PFJet> ());
-  auto_ptr<vector<reco::PFJet> > highSumPtPileupJets (new vector<reco::PFJet> ());
-  auto_ptr<vector<reco::Track> > highSumPtPileupJetsTracks (new vector<reco::Track> ());
-  auto_ptr<vector<reco::Track> > pvTracks (new vector<reco::Track> ());
+  auto vbfQuarks = std::make_unique<vector<reco::GenParticle>>();
+  auto vbfJets = std::make_unique<vector<reco::PFJet>>();
+  auto vbfJetsTracks = std::make_unique<vector<reco::Track>>();
+  auto pileupJets = std::make_unique<vector<reco::PFJet>>();
+  auto highSumPtPileupJets = std::make_unique<vector<reco::PFJet>>();
+  auto highSumPtPileupJetsTracks = std::make_unique<vector<reco::Track>>();
+  auto pvTracks = std::make_unique<vector<reco::Track>>();
 
   double sumptch, sumptchpv;
 
@@ -154,13 +154,13 @@ VBFQuarkProducer::produce (edm::Event &event, const edm::EventSetup &setup)
       pvTracks->push_back (**track);
     }
 
-  event.put (vbfQuarks, "vbfQuarks");
-  event.put (vbfJets, "vbfJets");
-  event.put (vbfJetsTracks, "vbfJetsTracks");
-  event.put (pileupJets, "pileupJets");
-  event.put (highSumPtPileupJets, "highSumPtPileupJets");
-  event.put (highSumPtPileupJetsTracks, "highSumPtPileupJetsTracks");
-  event.put (pvTracks, "pvTracks");
+  event.put (std::move(vbfQuarks), "vbfQuarks");
+  event.put (std::move(vbfJets), "vbfJets");
+  event.put (std::move(vbfJetsTracks), "vbfJetsTracks");
+  event.put (std::move(pileupJets), "pileupJets");
+  event.put (std::move(highSumPtPileupJets), "highSumPtPileupJets");
+  event.put (std::move(highSumPtPileupJetsTracks), "highSumPtPileupJetsTracks");
+  event.put (std::move(pvTracks), "pvTracks");
 }
 
 double

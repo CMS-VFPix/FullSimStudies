@@ -30,7 +30,7 @@ DelphesVertexProducer::produce (edm::Event &event, const edm::EventSetup &setup)
   edm::Handle<edm::View<reco::Track> > tracks;
   event.getByLabel (tracks_, tracks);
 
-  auto_ptr<vector<reco::Vertex> > delphesVertices (new vector<reco::Vertex> ());
+  auto delphesVertices = std::make_unique<vector<reco::Vertex>>();
 
   reco::Vertex *candidate = NULL;
 
@@ -120,7 +120,7 @@ DelphesVertexProducer::produce (edm::Event &event, const edm::EventSetup &setup)
   }
 ////////////////////////////////////////////////////////////////////////////////
 
-  event.put (delphesVertices, "");
+  event.put (std::move(delphesVertices), "");
 }
 
 void
