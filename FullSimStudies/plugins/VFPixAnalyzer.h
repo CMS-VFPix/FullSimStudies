@@ -53,6 +53,16 @@ class VFPixAnalyzer : public edm::EDAnalyzer
     edm::InputTag simTracks_;
     edm::InputTag pfCandidates_;
 
+    edm::EDGetTokenT<vector<reco::PFJet> > jetsToken_;
+    edm::EDGetTokenT<vector<reco::PFJet> > jetsNoCHSToken_;
+    edm::EDGetTokenT<vector<reco::TrackJet> > trackJetsToken_;
+    edm::EDGetTokenT<vector<PileupSummaryInfo> > pusToken_;
+    edm::EDGetTokenT<vector<reco::Vertex> > verticesToken_;
+    edm::EDGetTokenT<vector<reco::Track> > tracksToken_;
+    edm::EDGetTokenT<vector<reco::GenParticle> > genParticlesToken_;
+    edm::EDGetTokenT<vector<SimTrack> > simTracksToken_;
+    edm::EDGetTokenT<vector<reco::PFCandidate> > pfCandidatesToken_;
+
     void logSpace (const unsigned, const double, const double, vector<double> &) const;
     void linSpace (const unsigned, const double, const double, vector<double> &) const;
     bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;

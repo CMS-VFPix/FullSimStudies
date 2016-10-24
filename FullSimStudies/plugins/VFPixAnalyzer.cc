@@ -42,6 +42,16 @@ VFPixAnalyzer::VFPixAnalyzer (const edm::ParameterSet &cfg) :
 
   linSpace  (50,    0.0,   5.0,  trackEtaBins);
 
+  jetsToken_ = consumes<std::vector<reco::PFJet> > (jets_);
+  jetsNoCHSToken_ = consumes<std::vector<reco::PFJet> > (jetsNoCHS_);
+  trackJetsToken_ = consumes<std::vector<reco::TrackJet> > (trackJets_);
+  pusToken_ = consumes<std::vector<PileupSummaryInfo> > (pus_);
+  verticesToken_ = consumes<std::vector<reco::Vertex> > (vertices_);
+  tracksToken_ = consumes<std::vector<reco::Track> > (tracks_);
+  genParticlesToken_ = consumes<std::vector<reco::GenParticle> > (genParticles_);
+  simTracksToken_ = consumes<std::vector<SimTrack> > (simTracks_);
+  pfCandidatesToken_ = consumes<std::vector<reco::PFCandidate> > (pfCandidates_);
+
   TH1::SetDefaultSumw2 ();
   TFileDirectory jetDir = fs_->mkdir ("jets"),
                  puDir = fs_->mkdir ("pu"),
@@ -471,24 +481,25 @@ VFPixAnalyzer::~VFPixAnalyzer ()
 void
 VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
 {
+
   edm::Handle<vector<reco::PFJet> > jets;
-  event.getByLabel (jets_, jets);
+  event.getByToken (jetsToken_, jets);
   edm::Handle<vector<reco::PFJet> > jetsNoCHS;
-  event.getByLabel (jetsNoCHS_, jetsNoCHS);
+  event.getByToken (jetsNoCHSToken_, jetsNoCHS);
   edm::Handle<vector<reco::TrackJet> > trackJets;
-  event.getByLabel (trackJets_, trackJets);
+  event.getByToken (trackJetsToken_, trackJets);
   edm::Handle<vector<PileupSummaryInfo> > pus;
-  event.getByLabel (pus_, pus);
+  event.getByToken (pusToken_, pus);
   edm::Handle<vector<reco::Vertex> > vertices;
-  event.getByLabel (vertices_, vertices);
+  event.getByToken (verticesToken_, vertices);
   edm::Handle<vector<reco::Track> > tracks;
-  event.getByLabel (tracks_, tracks);
+  event.getByToken (tracksToken_, tracks);
   edm::Handle<vector<reco::GenParticle> > genParticles;
-  event.getByLabel (genParticles_, genParticles);
+  event.getByToken (genParticlesToken_, genParticles);
   edm::Handle<vector<SimTrack> > simTracks;
-  event.getByLabel (simTracks_, simTracks);
+  event.getByToken (simTracksToken_, simTracks);
   edm::Handle<vector<reco::PFCandidate> > pfCandidates;
-  event.getByLabel (pfCandidates_, pfCandidates);
+  event.getByToken (pfCandidatesToken_, pfCandidates);
 
   //double sumptch, sumptchpv, sumptchpu;
   double nPU_bx0 = 0.0;
@@ -517,9 +528,17 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
         }
     }
 
-  double pvTrueX = genParticles->at (2).vx (),
-         pvTrueY = genParticles->at (2).vy (),
-         pvTrueZ = genParticles->at (2).vz ();
+
+  double pvTrueX = 0,
+    pvTrueY = 0,
+    pvTrueZ = 0;
+
+  if (genParticles->size() > 2){
+    pvTrueX = genParticles->at (2).vx ();
+    pvTrueY = genParticles->at (2).vy ();
+    pvTrueZ = genParticles->at (2).vz ();
+  }
+
   unordered_set<long long> pvTrackID;
   if (vertices->size () > 0)
     {
@@ -558,6 +577,8 @@ VFPixAnalyzer::analyze (const edm::Event &event, const edm::EventSetup &setup)
           twoDHists_.at ("pvSumPt2VsGenSumPt2")->Fill (genSumPt2 (*genParticles), sumPt2);
         }
     }
+
+
   unsigned nVertices = 0;
   unsigned maxGenSumPt2Index = 0;
   for (const auto &vertex : *vertices)
