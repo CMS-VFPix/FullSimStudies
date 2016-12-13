@@ -1,0 +1,91 @@
+#ifndef VFPIX_ANALYZER
+#define VFPIX_ANALYZER
+
+#include <unordered_map>
+#include <string>
+
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/JetReco/interface/TrackJet.h"
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
+
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+
+#include "SimDataFormats/Track/interface/SimTrack.h"
+
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TH3D.h"
+
+using namespace std;
+
+class VFPixAnalyzer : public edm::EDAnalyzer
+{
+  public:
+    VFPixAnalyzer (const edm::ParameterSet &);
+    ~VFPixAnalyzer ();
+
+    void analyze (const edm::Event &, const edm::EventSetup &);
+
+  private:
+    edm::Service<TFileService> fs_;
+    unordered_map<string, TH1D *> oneDHists_;
+    unordered_map<string, TH2D *> twoDHists_;
+    unordered_map<string, TH3D *> threeDHists_;
+
+    edm::InputTag jets_;
+    edm::InputTag jetsNoCHS_;
+    edm::InputTag trackJets_;
+    edm::InputTag pus_;
+    edm::InputTag vertices_;
+    edm::InputTag trackingVertices_;
+    edm::InputTag tracks_;
+    edm::InputTag genParticles_;
+    edm::InputTag trackingParticles_;
+    edm::InputTag simTracks_;
+    edm::InputTag pfCandidates_;
+
+    edm::EDGetTokenT<vector<reco::PFJet> > jetsToken_;
+    edm::EDGetTokenT<vector<reco::PFJet> > jetsNoCHSToken_;
+    edm::EDGetTokenT<vector<reco::TrackJet> > trackJetsToken_;
+    edm::EDGetTokenT<vector<PileupSummaryInfo> > pusToken_;
+    edm::EDGetTokenT<vector<reco::Vertex> > verticesToken_;
+    edm::EDGetTokenT<vector<TrackingVertex> > trackingVerticesToken_;
+    edm::EDGetTokenT<vector<reco::Track> > tracksToken_;
+    edm::EDGetTokenT<vector<reco::GenParticle> > genParticlesToken_;
+    edm::EDGetTokenT<vector<TrackingParticle> > trackingParticlesToken_;
+    edm::EDGetTokenT<vector<SimTrack> > simTracksToken_;
+    edm::EDGetTokenT<vector<reco::PFCandidate> > pfCandidatesToken_;
+
+    void logSpace (const unsigned, const double, const double, vector<double> &) const;
+    void linSpace (const unsigned, const double, const double, vector<double> &) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<reco::GenParticle> > &, const unsigned, const double, const reco::GenParticle *&) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double, const SimTrack *&) const;
+    bool isMatched (const reco::Track &, const edm::Handle<vector<SimTrack> > &, const double) const;
+    template<class T> double beta (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
+    template<class T> double betaStar (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, double &, double &, unsigned = 0) const;
+    template<class T> double beta_dz (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    template<class T> double betaStar_dz (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    template<class T> double beta_dzSig (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    template<class T> double betaStar_dzSig (const T &, const edm::Handle<vector<reco::Track> > &, const edm::Handle<vector<reco::Vertex> > &, const double, double &, double &, unsigned = 0) const;
+    template<class T> void fillTrackHistograms (const T &, const edm::Handle<vector<reco::Track> > &, const reco::Vertex &) const;
+    double genSumPt2 (const vector<reco::GenParticle> &) const;
+    bool isGoodTrack (const reco::Track &, const bool = true) const;
+    bool isMatchedToTrack (const reco::GenParticle &, const vector<reco::Track> &, const double, unordered_set<int> &) const;
+    bool isMatchedToParticle (const reco::Track &, const vector<reco::GenParticle> &, const double, unordered_set<int> &) const;
+    bool isMatchedToPFChargedHadron (const reco::GenParticle &, const vector<reco::PFCandidate> &, const double, bool &) const;
+};
+
+#endif
