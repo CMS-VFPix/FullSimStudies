@@ -12,12 +12,12 @@ config.JobType.psetName = 'step3_RAW2DIGI_L1Reco_RECO_PAT_VALIDATION_DQM_trackin
 config.JobType.maxMemoryMB = 4000
 
 config.Data.inputDataset = '/TTbar_14TeV_GEN_SIM_900pre4_OT_Tilted_362_200_Pixel_4021_dropLargeRespace/jalimena-TTbar_14TeV_step2_900pre4_PU140_OT_Tilted_362_200_Pixel_4021_dropLargeRespace-1aac1ae337cd12a84a0981fe8cf52f42/USER'
+config.Data.outputDatasetTag = 'step3_trackingOnly_PU140'
 config.Data.inputDBS = 'phys03'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.outLFNDirBase = '/store/group/lpcfpix'
 config.Data.publication = True
-config.Data.outputDatasetTag = 'step3_trackingOnly_PU140'
 config.Data.ignoreLocality = True
 
 config.Site.whitelist = ["T1_US_FNAL"]
