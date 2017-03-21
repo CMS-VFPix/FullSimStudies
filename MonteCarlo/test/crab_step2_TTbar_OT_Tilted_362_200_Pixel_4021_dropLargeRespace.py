@@ -3,7 +3,7 @@ config = config()
 
 
 #config.General.requestName = 'TTbar_14TeV_step2_900pre4_PU140_OT_Tilted_362_200_Pixel_4021_dropLargeRespace'
-config.General.requestName = 'TTbar_14TeV_step2_900pre4_PU200_OT_Tilted_362_200_Pixel_4021_dropLargeRespace'
+config.General.requestName = 'TTbar_14TeV_step2_900pre4_PU200_OT_Tilted_362_200_Pixel_4021_dropLargeRespace_dupMatRemoved'
 config.General.workArea = 'crab'
 config.General.transferOutputs = True
 config.General.transferLogs = True
