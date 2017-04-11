@@ -90,6 +90,65 @@ note: see OT_Tilted_362_200_Pixel_4021_dropLarge2Small_2017_04_05.cfg for full c
 <rMaterial name="tracker:tkLayout_Si"/>
 </MaterialFraction>
 </CompositeMaterial>
+<CompositeMaterial name="servicecompositeR176Z1430" density="1.22996*g/cm3" method="mixture by weight">
+<MaterialFraction fraction="0.00459371">
+<rMaterial name="tracker:tkLayout_Acrylate"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.316331">
+<rMaterial name="tracker:tkLayout_Al"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0276729">
+<rMaterial name="tracker:tkLayout_Al_HV"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0472953">
+<rMaterial name="tracker:tkLayout_CO2"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.00456946">
+<rMaterial name="tracker:tkLayout_CO2_L1"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.00913891">
+<rMaterial name="tracker:tkLayout_CO2_L2"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0137084">
+<rMaterial name="tracker:tkLayout_CO2_L3"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0182778">
+<rMaterial name="tracker:tkLayout_CO2_L4"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0616831">
+<rMaterial name="tracker:tkLayout_Cu"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0424523">
+<rMaterial name="tracker:tkLayout_Cu_TWP_1+1_HS"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0192965">
+<rMaterial name="tracker:tkLayout_Cu_TWP_3+1_HS"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.00393747">
+<rMaterial name="tracker:tkLayout_Glass"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.00533055">
+<rMaterial name="tracker:tkLayout_Kapton"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.329157">
+<rMaterial name="tracker:tkLayout_PE"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0483868">
+<rMaterial name="tracker:tkLayout_Ti"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.00481685">
+<rMaterial name="tracker:tkLayout_Ti_L1"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0096337">
+<rMaterial name="tracker:tkLayout_Ti_L2"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0144505">
+<rMaterial name="tracker:tkLayout_Ti_L3"/>
+</MaterialFraction>
+<MaterialFraction fraction="0.0192674">
+<rMaterial name="tracker:tkLayout_Ti_L4"/>
+</MaterialFraction>
+</CompositeMaterial>
 <CompositeMaterial name="servicecompositeR248Z1609" density="0.843188*g/cm3" method="mixture by weight">
 <MaterialFraction fraction="0.00459371">
 <rMaterial name="tracker:tkLayout_Acrylate"/>
