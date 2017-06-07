@@ -4459,7 +4459,6 @@ note: see OT613_200_IT4025_opt7s4l_2017_06_07.cfg for full config files
 <rSolid name="pixel:Disc11"/>
 <rMaterial name="materials:Air"/>
 </LogicalPart>
-</LogicalPart>
 <LogicalPart name="serviceR176Z1430" category="unspecified">
 <rSolid name="pixel:serviceR176Z1430"/>
 <rMaterial name="pixel:servicecompositeR176Z1430"/>
