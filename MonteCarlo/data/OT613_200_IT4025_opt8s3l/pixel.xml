@@ -4531,7 +4531,6 @@ note: see OT613_200_IT4025_opt8s3l_2017_06_07.cfg for full config files
 <rSolid name="pixel:Disc11"/>
 <rMaterial name="materials:Air"/>
 </LogicalPart>
-</LogicalPart>
 <LogicalPart name="serviceR176Z1430" category="unspecified">
 <rSolid name="pixel:serviceR176Z1430"/>
 <rMaterial name="pixel:servicecompositeR176Z1430"/>
@@ -7609,7 +7608,6 @@ note: see OT613_200_IT4025_opt8s3l_2017_06_07.cfg for full config files
 <rChild name="pixel:Disc11"/>
 <Translation x="0*mm" y="0*mm" z="2259*mm"/>
 </PosPart>
-<PosPart copyNumber="1">
 <PosPart copyNumber="1">
 <rParent name="pixfwd:Phase2PixelEndcap"/>
 <rChild name="pixel:serviceR176Z1430"/>
