@@ -121,3 +121,10 @@ for path in process.paths:
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
 # End adding early deletion
+inputDir = "VFPix/MonteCarlo/data/OT613_200_IT4025_opt8s3l/"
+fileNames =["pixbar.xml","pixelProdCuts.xml","pixelStructureTopology.xml","pixelsens.xml","pixfwd.xml","tracker.xml","trackerProdCuts.xml","trackerRecoMaterial.xml","trackerStructureTopology.xml","trackersens.xml","pixel.xml"]
+for i in range (0, len (process.XMLIdealGeometryESSource.geomXMLFiles)):
+	xmlFile = process.XMLIdealGeometryESSource.geomXMLFiles[i]
+	fileName = xmlFile.split("/")[-1]
+	if fileName in fileNames:
+		process.XMLIdealGeometryESSource.geomXMLFiles[i] = inputDir + fileName
