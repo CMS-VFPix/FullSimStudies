@@ -1028,7 +1028,7 @@ process.source = cms.Source("DQMRootSource",
 '/store/group/lpcfpix/TTbar_14TeV_921_OT613_200_IT4025_opt8s3l/step3_trackingOnly_PU200/170609_082344/0000/step3_inDQM_997.root',
 '/store/group/lpcfpix/TTbar_14TeV_921_OT613_200_IT4025_opt8s3l/step3_trackingOnly_PU200/170609_082344/0000/step3_inDQM_998.root',
 '/store/group/lpcfpix/TTbar_14TeV_921_OT613_200_IT4025_opt8s3l/step3_trackingOnly_PU200/170609_082344/0000/step3_inDQM_999.root',
-'/store/group/lpcfpix/TTbar_14TeV_921_OT613_200_IT4025_opt8s3l/step3_trackingOnly_PU200/170609_082344/0000/step3_inDQM_1000.root',
+'/store/group/lpcfpix/TTbar_14TeV_921_OT613_200_IT4025_opt8s3l/step3_trackingOnly_PU200/170609_082344/0001/step3_inDQM_1000.root',
 ])
 )
 
