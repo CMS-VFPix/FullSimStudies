@@ -9,7 +9,7 @@ config.General.transferLogs = True
 config.JobType.pluginName = 'PrivateMC'
 config.JobType.psetName = 'TTbar_14TeV_TuneCUETP8M1_cfi_GEN_SIM_OT613_200_IT4025_opt8s3l.py'
 
-config.Data.outputPrimaryDataset = 'TTbar_14TeV_921_OT613_200_IT4025_opt8s3l'
+config.Data.outputPrimaryDataset = 'TTbar_14TeV_923_OT613_200_IT4025_opt8s3l'
 config.Data.outputDatasetTag = 'GenSim'
 config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = 10
