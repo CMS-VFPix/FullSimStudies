@@ -1204,7 +1204,7 @@ from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEar
 process = customiseEarlyDelete(process)
 # End adding early deletion
 
-inputDir = "VFPix/MonteCarlo/data/OT613_200_IT4025"
+inputDir = "VFPix/MonteCarlo/data/OT613_200_IT4025/"
 fileNames =["pixbar.xml","pixel.xml","pixelProdCuts.xml","pixelStructureTopology.xml","pixelsens.xml","pixfwd.xml","tracker.xml","trackerProdCuts.xml","trackerRecoMaterial.xml","trackerStructureTopology.xml","trackersens.xml"]
 for i in range (0, len (process.XMLIdealGeometryESSource.geomXMLFiles)):
         xmlFile = process.XMLIdealGeometryESSource.geomXMLFiles[i]
