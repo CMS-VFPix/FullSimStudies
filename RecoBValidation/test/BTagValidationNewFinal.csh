@@ -10,7 +10,7 @@ set refdir=$5
 mkdir ${valrel}_vs_${refrel}
 
 cd ${valrel}_vs_${refrel}
-plotFactory.py -b -f ${workdir}/CMSSW_${valdir}/src/VFPix/RecoBValidation/test/DQM_${valrel}.root -F ${workdir}/CMSSW_${refdir}/src/VFPix/RecoBValidation/test/DQM_${refrel}.root -r ${valrel} -R ${refrel} -s TTbar_Startup -S TTbar_Startup
+plotFactory.py -b -f ${workdir}/CMSSW_${valdir}/src/VFPix/RecoBValidation/test/${valrel}.root -F ${workdir}/CMSSW_${refdir}/src/VFPix/RecoBValidation/test/${refrel}.root -r ${valrel} -R ${refrel} -s TTbar_Startup -S TTbar_Startup
 cp ../0_leg*.gif .
 mv 0_leg1.gif 0_leg4.gif
 cd ..
