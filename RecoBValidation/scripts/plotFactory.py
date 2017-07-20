@@ -54,9 +54,9 @@ if options.batch : ROOT.gROOT.SetBatch()
 _style = Style.Style()
 _style.SetStyle()
 #title
-if options.ValSample==options.RefSample : title=options.ValRel+"vs"+options.RefRel+" "+options.ValSample+" "
+if options.ValSample==options.RefSample : title=options.ValRel+"_vs_"+options.RefRel+" "+options.ValSample+" "
 elif options.ValRel==options.RefRel : title=options.ValRel+" "+options.ValSample+"_vs_"+options.RefSample+" "
-else : title=options.ValRel+"vs"+options.RefRel+" "+options.ValSample+"_vs_"+options.RefSample+" "
+else : title=options.ValRel+"_vs_"+options.RefRel+" "+options.ValSample+"_vs_"+options.RefSample+" "
 #declaration
 c = {}
 perfAll_Val = {}
@@ -122,9 +122,9 @@ for b in EtaPtBin :
             else :
                 ratiosList = None
             #set name file
-            if options.ValSample == options.RefSample : saveName=options.ValRel+"vs"+options.RefRel+"_"+options.ValSample+"_Val_"+keyHisto+"_all"
+            if options.ValSample == options.RefSample : saveName=options.ValRel+"_vs_"+options.RefRel+"_"+options.ValSample+"_Val_"+keyHisto+"_all"
             elif options.ValRel==options.RefRel : saveName=options.ValRel+"_"+options.ValSample+"_vs_"+options.RefSample+"_Val_"+keyHisto+"_all"
-            else : saveName=options.ValRel+"vs"+options.RefRel+"_"+options.ValSample+"_vs_"+options.RefSample+"_Val_"+keyHisto+"_all"
+            else : saveName=options.ValRel+"_vs_"+options.RefRel+"_"+options.ValSample+"_vs_"+options.RefSample+"_Val_"+keyHisto+"_all"
             #save canvas
             c[keyHisto] = savePlots(title=title+tag,saveName=saveName,listFromats=listFromats,plot=h,Histos=valHistos[keyHisto]+refHistos[keyHisto],options=options,ratios=ratiosList,keyHisto=keyHisto,listLegend=listFlavors,legendName=h.legend)
         #for FlavEffVsBEff_B_discr

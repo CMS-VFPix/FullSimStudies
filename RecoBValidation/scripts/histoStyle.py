@@ -121,7 +121,7 @@ mapLineStyle = {
 #choose the formats to save the plots
 listFromats = [
     #"gif",
-    "pdf",
+    "png",
     ]
 #unity function
 unity = TF1("unity","1",-1000,1000)
