@@ -45,7 +45,8 @@ jetPt = plotInfo(name="jetPt", title="Pt of all jets", legend="isVAL KEY-jets", 
                  )
 jetEta = plotInfo(name="jetEta", title="Eta of all jets", legend="isVAL KEY-jets", Xlabel="#eta", Ylabel="abitrary units",
                   logY=False, grid=False,
-                  binning=[11,90], Rebin=4, doNormalization=True,
+                  #binning=[11,90], Rebin=4, doNormalization=True,
+                  binning=None, Rebin=None, doNormalization=True,
                   listTagger=["CSVv2"]
                   )
 discr = plotInfo(name="discr", title="Discriminant of all jets", legend="isVAL KEY-jets", Xlabel="Discriminant", Ylabel="abitrary units",
