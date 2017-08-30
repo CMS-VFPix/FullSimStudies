@@ -1,7 +1,7 @@
 # Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
+# using:
+# Revision: 1.19
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
 # with command line options: step3 --conditions auto:phase2_realistic --pileup_input das:/RelValMinBias_14TeV/1/GEN-SIM --pileup AVE_200_BX_25ns -n 10 --era Phase2C2 --eventcontent RECOSIM,DQM --runUnscheduled -s RAW2DIGI,RECO:reconstruction_trackingOnly,VALIDATION:@trackingOnlyValidation,DQM:@trackingOnlyDQM --datatier GEN-SIM-RECO,DQMIO --geometry Extended2023D17 --filein file:step2.root --fileout file:step3.root
 import FWCore.ParameterSet.Config as cms
 
@@ -82,6 +82,21 @@ process.RandomNumberGeneratorService.restoreStateLabel=cms.untracked.string("ran
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
+#change b-tagging to look at 2.4<eta<4 jets
+process.bTagCommonBlock.etaMin = cms.double(2.4)
+process.bTagHarvest.etaMin = cms.double(2.4)
+process.bTagHarvestMC.etaMin = cms.double(2.4)
+process.bTagAnalysis.etaMin = cms.double(2.4)
+process.bTagValidation.etaMin = cms.double(2.4)
+process.bTagValidationNoall.etaMin = cms.double(2.4)
+
+process.bTagCommonBlock.etaMax = cms.double(4.0)
+process.bTagHarvest.etaMax = cms.double(4.0)
+process.bTagHarvestMC.etaMax = cms.double(4.0)
+process.bTagAnalysis.etaMax = cms.double(4.0)
+process.bTagValidation.etaMax = cms.double(4.0)
+process.bTagValidationNoall.etaMax = cms.double(4.0)
+
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.reconstruction_step = cms.Path(process.reconstruction_trackingOnly)
@@ -100,7 +115,7 @@ associatePatAlgosToolsTask(process)
 # customisation of the process.
 
 # Automatic addition of the customisation function from SimGeneral.MixingModule.fullMixCustomize_cff
-from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn 
+from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn
 
 #call to customisation function setCrossingFrameOn imported from SimGeneral.MixingModule.fullMixCustomize_cff
 process = setCrossingFrameOn(process)

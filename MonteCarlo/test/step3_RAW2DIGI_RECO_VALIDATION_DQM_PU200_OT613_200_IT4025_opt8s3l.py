@@ -200,6 +200,21 @@ process.RandomNumberGeneratorService.restoreStateLabel=cms.untracked.string("ran
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
+#change b-tagging to look at 2.4<eta<4 jets
+process.bTagCommonBlock.etaMin = cms.double(2.4)
+process.bTagHarvest.etaMin = cms.double(2.4)
+process.bTagHarvestMC.etaMin = cms.double(2.4)
+process.bTagAnalysis.etaMin = cms.double(2.4)
+process.bTagValidation.etaMin = cms.double(2.4)
+process.bTagValidationNoall.etaMin = cms.double(2.4)
+
+process.bTagCommonBlock.etaMax = cms.double(4.0)
+process.bTagHarvest.etaMax = cms.double(4.0)
+process.bTagHarvestMC.etaMax = cms.double(4.0)
+process.bTagAnalysis.etaMax = cms.double(4.0)
+process.bTagValidation.etaMax = cms.double(4.0)
+process.bTagValidationNoall.etaMax = cms.double(4.0)
+
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
