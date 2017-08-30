@@ -71,8 +71,8 @@ listTag = [
     "JBP",
     "TCHE",
     "SSVHE",
-    "SMT",
-    "SET",
+    #"SMT",
+    #"SET",
     ]
 #list of flavors to look at
 listFlavors = [
