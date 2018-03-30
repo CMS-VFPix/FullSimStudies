@@ -1,13 +1,13 @@
 # Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
+# using:
+# Revision: 1.19
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
 # with command line options: MinBias_14TeV_pythia8_TuneCUETP8M1_cfi --conditions auto:phase2_realistic -n 10 --era Phase2C2 --eventcontent FEVTDEBUG --relval 90000,100 -s GEN,SIM --datatier GEN-SIM --beamspot HLLHC14TeV --geometry Extended2023D17 --fileout file:step1.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('SIM',eras.Phase2C2)
+process = cms.Process('SIM',eras.Phase2)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -68,25 +68,25 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
 process.generator = cms.EDFilter("Pythia8GeneratorFilter",
     PythiaParameters = cms.PSet(
-        parameterSets = cms.vstring('pythia8CommonSettings', 
-            'pythia8CUEP8M1Settings', 
+        parameterSets = cms.vstring('pythia8CommonSettings',
+            'pythia8CUEP8M1Settings',
             'processParameters'),
-        processParameters = cms.vstring('SoftQCD:nonDiffractive = on', 
-            'SoftQCD:singleDiffractive = on', 
+        processParameters = cms.vstring('SoftQCD:nonDiffractive = on',
+            'SoftQCD:singleDiffractive = on',
             'SoftQCD:doubleDiffractive = on'),
-        pythia8CUEP8M1Settings = cms.vstring('Tune:pp 14', 
-            'Tune:ee 7', 
-            'MultipartonInteractions:pT0Ref=2.4024', 
-            'MultipartonInteractions:ecmPow=0.25208', 
+        pythia8CUEP8M1Settings = cms.vstring('Tune:pp 14',
+            'Tune:ee 7',
+            'MultipartonInteractions:pT0Ref=2.4024',
+            'MultipartonInteractions:ecmPow=0.25208',
             'MultipartonInteractions:expPow=1.6'),
-        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2', 
-            'Main:timesAllowErrors = 10000', 
-            'Check:epTolErr = 0.01', 
-            'Beams:setProductionScalesFromLHEF = off', 
-            'SLHA:keepSM = on', 
-            'SLHA:minMassSM = 1000.', 
-            'ParticleDecays:limitTau0 = on', 
-            'ParticleDecays:tau0Max = 10', 
+        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2',
+            'Main:timesAllowErrors = 10000',
+            'Check:epTolErr = 0.01',
+            'Beams:setProductionScalesFromLHEF = off',
+            'SLHA:keepSM = on',
+            'SLHA:minMassSM = 1000.',
+            'ParticleDecays:limitTau0 = on',
+            'ParticleDecays:tau0Max = 10',
             'ParticleDecays:allowPhotonRadiation = on')
     ),
     comEnergy = cms.double(14000.0),
@@ -113,7 +113,7 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 # filter all path with the production filter sequence
 for path in process.paths:
-	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq 
+	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq
 
 
 # Customisation from command line
