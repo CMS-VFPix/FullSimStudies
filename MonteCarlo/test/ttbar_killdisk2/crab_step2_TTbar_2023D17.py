@@ -2,17 +2,18 @@ from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 config = config()
 
 
-config.General.requestName = 'TTbar_14TeV_step2_932_PU200_2023D17'
+config.General.requestName = 'TTbar_14TeV_step2_932_PU200_OT613_IT4025_deadDisk2'
 config.General.workArea = 'crab'
 config.General.transferOutputs = True
 config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'step2_DIGI_L1_L1TrackTrigger_DIGI2RAW_HLT_PU200.py'
+config.JobType.psetName = 'step2_DIGI_L1_L1TrackTrigger_DIGI2RAW_HLT_PU200_OT613_IT4025.py'
 config.JobType.maxMemoryMB = 4000
 
-config.Data.inputDataset = '/RelValTTbar_14TeV/CMSSW_9_3_2-93X_upgrade2023_realistic_v2_2023D17noPU-v1/GEN-SIM'
-config.Data.outputDatasetTag = 'step2_PU200'
+config.Data.inputDataset = '/TTbar_14TeV_932_OT613_200_IT4025/jalimena-GenSim-07a47ef0959d9ba314cf0f592af5aa44/USER'
+config.Data.outputDatasetTag = 'step2_PU200_deadFPix2pos'
+config.Data.inputDBS = 'phys03'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 config.Data.outLFNDirBase = '/store/group/lpcfpix'
