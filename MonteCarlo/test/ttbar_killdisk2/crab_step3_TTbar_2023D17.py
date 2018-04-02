@@ -9,7 +9,7 @@ config.General.transferLogs = True
 
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'step3_RAW2DIGI_L1Reco_RECO_PAT_VALIDATION_DQM_PU200_OT613_IT4025.py'
-config.JobType.maxMemoryMB = 8000
+config.JobType.maxMemoryMB = 16000
 config.JobType.numCores = 4
 
 config.Data.inputDataset = '/TTbar_14TeV_932_OT613_200_IT4025/jalimena-step2_PU200_deadFPix2pos-15b244caa00a89f5ae32cac14dfe5cce/USER'
