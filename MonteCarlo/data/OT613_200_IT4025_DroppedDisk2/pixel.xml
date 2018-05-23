@@ -90,38 +90,6 @@ note: see OT613_200_IT4025_2018_05_10.cfg for full config files
 <rMaterial name="tracker:tkLayout_Si"/>
 </MaterialFraction>
 </CompositeMaterial>
-<CompositeMaterial name="servicecompositeR270Z2567" density="0.431491*g/cm3" method="mixture by weight">
-<MaterialFraction fraction="0.00525027">
-<rMaterial name="tracker:tkLayout_Acrylate"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.178237">
-<rMaterial name="tracker:tkLayout_Al"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.0300016">
-<rMaterial name="tracker:tkLayout_Al_HV"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.141826">
-<rMaterial name="tracker:tkLayout_CO2"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.073913">
-<rMaterial name="tracker:tkLayout_Cu"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.0663035">
-<rMaterial name="tracker:tkLayout_Cu_TWP_1+1_HS"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.00450024">
-<rMaterial name="tracker:tkLayout_Glass"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.0057003">
-<rMaterial name="tracker:tkLayout_Kapton"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.349171">
-<rMaterial name="tracker:tkLayout_PE"/>
-</MaterialFraction>
-<MaterialFraction fraction="0.145098">
-<rMaterial name="tracker:tkLayout_Ti"/>
-</MaterialFraction>
-</CompositeMaterial>
 <CompositeMaterial name="servicecompositeR176Z1430" density="1.6023*g/cm3" method="mixture by weight">
 <MaterialFraction fraction="0.00698543">
 <rMaterial name="tracker:tkLayout_Acrylate"/>
@@ -4737,10 +4705,6 @@ note: see OT613_200_IT4025_2018_05_10.cfg for full config files
 <rSolid name="pixel:Disc11"/>
 <rMaterial name="materials:Air"/>
 </LogicalPart>
-<LogicalPart name="serviceR270Z2567" category="unspecified">
-<rSolid name="pixel:serviceR270Z2567"/>
-<rMaterial name="pixel:servicecompositeR270Z2567"/>
-</LogicalPart>
 <LogicalPart name="serviceR176Z1430" category="unspecified">
 <rSolid name="pixel:serviceR176Z1430"/>
 <rMaterial name="pixel:servicecompositeR176Z1430"/>
@@ -5750,7 +5714,6 @@ note: see OT613_200_IT4025_2018_05_10.cfg for full config files
 <Tubs name="Ring4Disc11" rMin="187.79*mm" rMax="232.596*mm" dz="2.585*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Tubs name="Ring5Disc11" rMin="209.78*mm" rMax="254.535*mm" dz="2.585*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Tubs name="Disc11" rMin="63.78*mm" rMax="254.545*mm" dz="6.595*mm" startPhi="0*deg" deltaPhi="360*deg"/>
-<Tubs name="serviceR270Z2567" rMin="270.525*mm" rMax="270.425*mm" dz="1*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Tubs name="serviceR176Z1430" rMin="176.838*mm" rMax="178.838*mm" dz="14.1625*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Tubs name="serviceR248Z1609" rMin="248.4*mm" rMax="270.425*mm" dz="1*mm" startPhi="0*deg" deltaPhi="360*deg"/>
 <Tubs name="serviceR228Z1609" rMin="228.169*mm" rMax="248.4*mm" dz="1*mm" startPhi="0*deg" deltaPhi="360*deg"/>
@@ -7867,11 +7830,6 @@ note: see OT613_200_IT4025_2018_05_10.cfg for full config files
 <rParent name="pixfwd:Phase2PixelEndcap"/>
 <rChild name="pixel:Disc11"/>
 <Translation x="0*mm" y="0*mm" z="2259*mm"/>
-</PosPart>
-<PosPart copyNumber="1">
-<rParent name="pixfwd:Phase2PixelEndcap"/>
-<rChild name="pixel:serviceR270Z2567"/>
-<Translation x="0*mm" y="0*mm" z="2276.57*mm"/>
 </PosPart>
 <PosPart copyNumber="1">
 <rParent name="pixfwd:Phase2PixelEndcap"/>
